@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Voice-only conversational AI training with adaptive Bloom's taxonomy questioning."><link rel="icon" type="image/svg+xml" href="/voxmachina/favicon.svg"><title>VoxMachina — Voice AI Training</title><link rel="stylesheet" href="/voxmachina/_astro/index.Bx4t35MR.css"></head> <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">   <header class="relative overflow-hidden border-b border-slate-800"> <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div> <div class="relative mx-auto max-w-3xl px-6 py-12 text-center"> <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400"> <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Voice-only conversational AI training with adaptive Bloom's taxonomy questioning."><link rel="icon" type="image/svg+xml" href="/voxmachina/favicon.svg"><title>VoxMachina — Voice AI Training</title><link rel="stylesheet" href="/voxmachina/_astro/index.CzWFHXwq.css"></head> <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">   <header class="relative overflow-hidden border-b border-slate-800"> <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div> <div class="relative mx-auto max-w-3xl px-6 py-12 text-center"> <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400"> <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
 Powered by ElevenLabs Agents
 </div> <h1 class="bg-gradient-to-r from-blue-400 via-sky-300 to-violet-400 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
 VoxMachina
@@ -13,7 +13,7 @@ Conversation
 Reflection
 </div> </div> <p id="phase-hint" class="mt-4 text-center text-sm text-slate-500">
 Start with Ms. Goodwill — she'll brief you in German before the conversation.
-</p> </section>  <section class="mx-auto max-w-3xl px-6 pb-4"> <div id="subtitle-bar" class="hidden rounded-xl border border-slate-700 bg-slate-900/80 p-4 backdrop-blur sticky top-0 z-50"> <div class="flex items-center gap-3"> <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg"></div> <div class="flex-1 min-h-[1.5rem]"> <p id="subtitle-text" class="text-base text-slate-100 leading-relaxed"></p> </div> <div id="subtitle-indicator" class="flex gap-1 shrink-0"> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> </div> </div> </div> </section>  <section class="mx-auto max-w-3xl px-6 pb-16 space-y-6"> <!-- Ms. Goodwill --> <div id="goodwill-card" class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur"> <div class="flex items-start gap-4"> <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-2xl">👩‍🏫</div> <div class="flex-1"> <h2 class="text-xl font-semibold text-violet-300">Ms. Goodwill</h2> <p class="text-sm text-slate-400 mt-0.5">German mentor — briefing & reflection</p> <p class="text-sm text-slate-500 mt-3">
+</p> </section>  <section class="mx-auto max-w-3xl px-6 pb-16 space-y-6"> <!-- Ms. Goodwill --> <div id="goodwill-card" class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur"> <div class="flex items-start gap-4"> <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-2xl">👩‍🏫</div> <div class="flex-1"> <h2 class="text-xl font-semibold text-violet-300">Ms. Goodwill</h2> <p class="text-sm text-slate-400 mt-0.5">German mentor — briefing & reflection</p> <p class="text-sm text-slate-500 mt-3">
 Bereitet dich auf das Gespräch vor und führt die Nachbesprechung durch.
             Spricht Schweizer Hochdeutsch.
 </p> </div> <div class="flex flex-col gap-2 shrink-0"> <button data-agent="goodwill" data-action="start" class="rounded-lg bg-violet-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-violet-500">
@@ -25,15 +25,20 @@ A senior buyer who asks adaptive questions. 10 questions per session,
             difficulty adjusts to your answers.
 </p> </div> <div class="shrink-0"> <button data-agent="barker" data-action="start" disabled class="cursor-not-allowed rounded-lg bg-slate-700 px-5 py-2 text-sm font-medium text-slate-400">
 🔒 Locked
-</button> </div> </div> </div> </section>  <section class="mx-auto max-w-3xl px-6 pb-16"> <details class="rounded-2xl border border-slate-800 bg-slate-900/30 backdrop-blur"> <summary class="cursor-pointer px-6 py-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition">
+</button> </div> </div> </div> </section>  <section class="mx-auto max-w-3xl px-6 pb-32"> <details class="rounded-2xl border border-slate-800 bg-slate-900/30 backdrop-blur"> <summary class="cursor-pointer px-6 py-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition">
 📝 Full Transcript
 </summary> <div id="transcript-log" class="max-h-96 overflow-y-auto px-6 pb-4 space-y-3"> <p class="text-sm text-slate-600 italic">Transcript will appear here during conversations.</p> </div> </details> </section>  <footer class="border-t border-slate-800 py-6 text-center text-sm text-slate-600"> <a href="https://github.com/wagemutig/voxmachina" class="hover:text-slate-400 transition">
 github.com/wagemutig/voxmachina
-</a> </footer>  <div id="widget-container" class="fixed bottom-4 right-4 z-50 hidden"> <elevenlabs-convai id="voxmachina-widget" agent-id="agent_8201kvcwd293enybm2s3tpqkr9dy" start-text="Talk to Ms. Goodwill" brand-color="#8b5cf6"></elevenlabs-convai> </div>  <script src="https://elevenlabs.io/convai-widget/index.js" async></script>  <script>(function(){const BARKER_ID = "agent_1701kvcwacnje8dsehmmrsged276";
+</a> </footer>  <div id="bottom-bar" class="hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700 bg-slate-950/95 backdrop-blur-lg"> <div class="mx-auto max-w-3xl px-4 py-3 space-y-2"> <!-- Subtitle Line --> <div class="flex items-center gap-3 min-h-[2rem]"> <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg">💬</div> <div class="flex-1"> <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed">Waiting for conversation to start…</p> </div> <div id="subtitle-indicator" class="flex gap-1 shrink-0"> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> </div> </div> <!-- Text Input --> <div class="flex items-center gap-2"> <input id="text-input" type="text" placeholder="Type your message…" class="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" autocomplete="off"> <button id="send-btn" class="shrink-0 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+Send
+</button> </div> </div> </div>  <div id="widget-container" class="hidden"> <elevenlabs-convai id="voxmachina-widget" agent-id="agent_8201kvcwd293enybm2s3tpqkr9dy" start-text="Talk to Ms. Goodwill" brand-color="#8b5cf6"></elevenlabs-convai> </div>  <script src="https://elevenlabs.io/convai-widget/index.js" async></script>  <script>(function(){const BARKER_ID = "agent_1701kvcwacnje8dsehmmrsged276";
 const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
 
     // ── State ──────────────────────────────────
     let currentPhase = 1;
+    let conversationActive = false;
+    let currentAgentName = '';
+    let currentAgentIcon = '';
     const transcript = [];
 
     const phases = {
@@ -53,15 +58,26 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
       document.getElementById('phase-hint').textContent = phases[n].hint;
     }
 
-    // ── Subtitle System ────────────────────────
-    const subtitleBar = document.getElementById('subtitle-bar');
+    // ── Bottom Bar ─────────────────────────────
+    const bottomBar = document.getElementById('bottom-bar');
     const subtitleText = document.getElementById('subtitle-text');
     const subtitleIcon = document.getElementById('subtitle-speaker-icon');
     const subtitleIndicator = document.getElementById('subtitle-indicator');
     const transcriptLog = document.getElementById('transcript-log');
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    function showBottomBar() {
+      bottomBar.classList.remove('hidden');
+      conversationActive = true;
+    }
+
+    function hideBottomBar() {
+      bottomBar.classList.add('hidden');
+      conversationActive = false;
+    }
 
     function showSubtitles(speaker, text, icon) {
-      subtitleBar.classList.remove('hidden');
       subtitleText.textContent = text;
       subtitleIcon.textContent = icon;
       subtitleIcon.className = speaker === 'agent'
@@ -72,7 +88,7 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
       const dots = subtitleIndicator.querySelectorAll('span');
       dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse');
 
-      // Auto-hide after 8 seconds of no new text
+      // Auto-dim after 8 seconds
       clearTimeout(window._subtitleTimeout);
       window._subtitleTimeout = setTimeout(() => {
         if (subtitleText.textContent === text) {
@@ -85,7 +101,6 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
       const entry = { speaker, text, time: new Date().toLocaleTimeString(), agentName };
       transcript.push(entry);
 
-      // Remove placeholder
       const placeholder = transcriptLog.querySelector('.italic');
       if (placeholder) placeholder.remove();
 
@@ -103,13 +118,44 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
       transcriptLog.scrollTop = transcriptLog.scrollHeight;
     }
 
+    // ── Text Input ─────────────────────────────
+    function sendText() {
+      const text = textInput.value.trim();
+      if (!text || !conversationActive) return;
+
+      // Show user message in subtitles + transcript
+      showSubtitles('user', text, '🎙️');
+      addToTranscript('user', text, currentAgentName);
+
+      // Send to widget — dispatch a custom event
+      const widget = document.getElementById('voxmachina-widget');
+      widget.dispatchEvent(new CustomEvent('elevenlabs-convai:user_input', {
+        detail: { text },
+        bubbles: true,
+      }));
+
+      // Also try sending via the widget's API if available
+      if (widget.sendTextMessage) {
+        widget.sendTextMessage(text);
+      } else if (widget.conversation && widget.conversation.sendText) {
+        widget.conversation.sendText(text);
+      }
+
+      textInput.value = '';
+    }
+
+    sendBtn.addEventListener('click', sendText);
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendText();
+      }
+    });
+
     // ── Widget Event Listener ──────────────────
-    // The ElevenLabs widget dispatches events we can listen to.
-    // We hook into the conversation via the widget's callback system.
     function attachWidgetListeners(widget, agentName, agentIcon) {
-      // The widget fires "elevenlabs-convai:call" when conversation starts
       widget.addEventListener('elevenlabs-convai:call', (event) => {
-        // Configure client tools / callbacks
+        showBottomBar();
         if (event.detail && event.detail.config) {
           event.detail.config.onConnect = () => {
             console.log(`Connected to ${agentName}`);
@@ -117,8 +163,6 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
         }
       });
 
-      // Listen for transcript events via custom DOM events
-      // The widget bubbles up WebSocket events as CustomEvents
       widget.addEventListener('elevenlabs-convai:user_transcript', (event) => {
         const text = event.detail?.text || event.detail || '';
         if (text) {
@@ -139,7 +183,6 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
         const text = event.detail?.text || event.detail || '';
         if (text) {
           showSubtitles('agent', text, agentIcon);
-          // Update last transcript entry
           const last = transcript[transcript.length - 1];
           if (last && last.speaker === 'agent') {
             last.text = text;
@@ -153,27 +196,29 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
         }
       });
 
-      // Also listen for conversation end
       widget.addEventListener('elevenlabs-convai:disconnect', () => {
         const dots = subtitleIndicator.querySelectorAll('span');
         dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
+        subtitleText.textContent = 'Conversation ended. Click an agent to start a new one.';
       });
     }
 
-    // ── Floating Widget Agent Switching ────────
+    // ── Agent Switching ────────────────────────
     const widgetContainer = document.getElementById('widget-container');
     const widget = document.getElementById('voxmachina-widget');
 
     function switchAgent(agentId, agentName, agentIcon, brandColor) {
-      // Update widget attributes — the widget picks up the new agent
+      currentAgentName = agentName;
+      currentAgentIcon = agentIcon;
+
       widget.setAttribute('agent-id', agentId);
       widget.setAttribute('brand-color', brandColor);
       widget.setAttribute('start-text', `Talk to ${agentName}`);
 
-      // Show the floating widget
       widgetContainer.classList.remove('hidden');
+      showBottomBar();
+      subtitleText.textContent = `Click the floating button to start talking with ${agentName}.`;
 
-      // Re-attach listeners
       attachWidgetListeners(widget, agentName, agentIcon);
     }
 
