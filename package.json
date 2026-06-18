@@ -12,9 +12,15 @@
     "start:barker": "node src/index.js --agent barker",
     "start:goodwill": "node src/index.js --agent goodwill"
   },
-  "keywords": ["elevenlabs", "voice-ai", "training", "conversational-ai"],
+  "keywords": [
+    "elevenlabs",
+    "voice-ai",
+    "training",
+    "conversational-ai"
+  ],
   "license": "MIT",
   "dependencies": {
+    "@astrojs/vercel": "^10.0.8",
     "astro": "^6.4.8"
   },
   "devDependencies": {

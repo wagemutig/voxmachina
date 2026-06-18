@@ -1,9 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const BARKER_ID = 'agent_9601kvdjdvqefd99es8881mc4z9g';
-const GOODWILL_ID = 'agent_5001kvdjcj2ke88aenh6yq6wh02h';
-const ACCESS_PIN = '1924'; // Change this to your desired PIN
+const BARKER_ID = ''; // Fetched from API after PIN
+const GOODWILL_ID = ''; // Fetched from API after PIN
 ---
 
 <Layout title="VoxMachina — Voice AI Training">
@@ -240,9 +239,9 @@ const ACCESS_PIN = '1924'; // Change this to your desired PIN
   <script type="module">
     import { Conversation } from 'https://esm.sh/@elevenlabs/client@1.11.2';
 
-    const BARKER_ID = 'agent_9601kvdjdvqefd99es8881mc4z9g';
-    const GOODWILL_ID = 'agent_5001kvdjcj2ke88aenh6yq6wh02h';
-    const ACCESS_PIN = '1924';
+    const BARKER_ID = ''; // Fetched after PIN auth
+    const GOODWILL_ID = ''; // Fetched after PIN auth
+    let agentIds = { barker: '', goodwill: '' };
 
     // ── State ──────────────────────────
     let conversation = null;
@@ -546,25 +545,24 @@ const ACCESS_PIN = '1924'; // Change this to your desired PIN
     // Transition modal buttons
     transitionContinue.addEventListener('click', () => {
       hideTransition();
-      // PIN already unlocked, go straight to mode choice
       setPhase(2);
       currentPhase = 2;
-      showModeChoice(BARKER_ID, 'Mr. Barker', '🧑‍💼');
+      showModeChoice(agentIds.barker, 'Mr. Barker', '🧑‍💼');
     });
     transitionCancel.addEventListener('click', () => {
       hideTransition();
     });
 
     // ── PIN gate ───────────────────────
-    function requestPin(agentId, agentName, agentIcon, phase) {
+    function requestPin(agent, agentName, agentIcon, phase) {
       if (pinUnlocked) {
-        // Already unlocked, skip straight to mode choice
+        const id = agent === 'barker' ? agentIds.barker : agentIds.goodwill;
         currentPhase = phase;
         setPhase(phase);
-        showModeChoice(agentId, agentName, agentIcon);
+        showModeChoice(id, agentName, agentIcon);
         return;
       }
-      pendingAgent = { id: agentId, name: agentName, icon: agentIcon, phase };
+      pendingAgent = { agent, name: agentName, icon: agentIcon, phase };
       pinError.classList.add('hidden');
       pinInput.value = '';
       pinModal.classList.remove('hidden');
@@ -572,22 +570,47 @@ const ACCESS_PIN = '1924'; // Change this to your desired PIN
       setTimeout(() => pinInput.focus(), 100);
     }
 
-    function checkPin() {
+    async function checkPin() {
       const entered = pinInput.value.trim();
-      if (entered === ACCESS_PIN) {
-        pinUnlocked = true;
-        pinModal.classList.add('hidden');
-        pinModal.classList.remove('flex');
-        if (pendingAgent) {
-          currentPhase = pendingAgent.phase;
-          setPhase(pendingAgent.phase);
-          showModeChoice(pendingAgent.id, pendingAgent.name, pendingAgent.icon);
-          pendingAgent = null;
+      if (!entered) return;
+
+      pinSubmit.textContent = 'Checking…';
+      pinSubmit.disabled = true;
+      pinError.classList.add('hidden');
+
+      try {
+        const resp = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: entered }),
+        });
+
+        const data = await resp.json();
+
+        if (resp.ok && data.ok) {
+          pinUnlocked = true;
+          agentIds = data.agents;
+          pinModal.classList.add('hidden');
+          pinModal.classList.remove('flex');
+          if (pendingAgent) {
+            currentPhase = pendingAgent.phase;
+            setPhase(pendingAgent.phase);
+            const id = pendingAgent.agent === 'barker' ? agentIds.barker : agentIds.goodwill;
+            showModeChoice(id, pendingAgent.name, pendingAgent.icon);
+            pendingAgent = null;
+          }
+        } else {
+          pinError.textContent = data.error || 'Wrong PIN';
+          pinError.classList.remove('hidden');
+          pinInput.value = '';
+          pinInput.focus();
         }
-      } else {
+      } catch (e) {
+        pinError.textContent = 'Connection error. Try again.';
         pinError.classList.remove('hidden');
-        pinInput.value = '';
-        pinInput.focus();
+      } finally {
+        pinSubmit.textContent = 'Unlock';
+        pinSubmit.disabled = false;
       }
     }
 
@@ -608,18 +631,18 @@ const ACCESS_PIN = '1924'; // Change this to your desired PIN
         if (agent === 'goodwill') {
           btn.classList.add('hidden');
           document.querySelector('button[data-action="start-reflection"]').classList.remove('hidden');
-          requestPin(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', 1);
+          requestPin('goodwill', 'Ms. Goodwill', '👩‍🏫', 1);
         }
         if (agent === 'barker') {
           btn.classList.add('hidden');
           document.getElementById('barker-card').classList.remove('opacity-50');
-          requestPin(BARKER_ID, 'Mr. Barker', '🧑‍💼', 2);
+          requestPin('barker', 'Mr. Barker', '🧑‍💼', 2);
         }
       });
     });
 
     document.querySelector('button[data-action="start-reflection"]')?.addEventListener('click', () => {
-      requestPin(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', 3);
+      requestPin('goodwill', 'Ms. Goodwill', '👩‍🏫', 3);
     });
 
     // Auto-unlock Mr. Barker after 15s
