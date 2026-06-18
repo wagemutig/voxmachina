@@ -1,0 +1,12 @@
+{
+  "name": "voxmachina",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Voice-only conversational AI training bot with ElevenLabs Agents",
+  "scripts": {
+    "start:barker": "node src/index.js --agent barker",
+    "start:goodwill": "node src/index.js --agent goodwill"
+  },
+  "keywords": ["elevenlabs", "voice-ai", "training", "conversational-ai"],
+  "license": "MIT"
+}
