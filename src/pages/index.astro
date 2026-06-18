@@ -1,0 +1,335 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const BARKER_ID = 'agent_1701kvcwacnje8dsehmmrsged276';
+const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
+---
+
+<Layout title="VoxMachina — Voice AI Training">
+  <!-- Hero -->
+  <header class="relative overflow-hidden border-b border-slate-800">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div>
+    <div class="relative mx-auto max-w-3xl px-6 py-12 text-center">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400">
+        <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+        Powered by ElevenLabs Agents
+      </div>
+      <h1 class="bg-gradient-to-r from-blue-400 via-sky-300 to-violet-400 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
+        VoxMachina
+      </h1>
+      <p class="mt-4 text-lg text-slate-400 max-w-xl mx-auto">
+        Voice-only conversational AI training. Practice sales pitches with an
+        adaptive English customer, guided by a German mentor.
+      </p>
+    </div>
+  </header>
+
+  <!-- Phase Flow -->
+  <section class="mx-auto max-w-3xl px-6 py-6">
+    <div class="flex items-center justify-center gap-2 sm:gap-4 text-sm">
+      <div id="phase-1" class="flex items-center gap-2 rounded-lg border border-blue-500 bg-blue-500/10 px-4 py-2 font-medium text-blue-300 transition-all">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">1</span>
+        Briefing
+      </div>
+      <div class="h-px w-6 sm:w-12 bg-slate-700"></div>
+      <div id="phase-2" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-500 transition-all">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-white">2</span>
+        Conversation
+      </div>
+      <div class="h-px w-6 sm:w-12 bg-slate-700"></div>
+      <div id="phase-3" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-500 transition-all">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-white">3</span>
+        Reflection
+      </div>
+    </div>
+    <p id="phase-hint" class="mt-4 text-center text-sm text-slate-500">
+      Start with Ms. Goodwill — she'll brief you in German before the conversation.
+    </p>
+  </section>
+
+  <!-- Live Subtitles Bar -->
+  <section class="mx-auto max-w-3xl px-6 pb-4">
+    <div id="subtitle-bar" class="hidden rounded-xl border border-slate-700 bg-slate-900/80 p-4 backdrop-blur sticky top-0 z-50">
+      <div class="flex items-center gap-3">
+        <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg"></div>
+        <div class="flex-1 min-h-[1.5rem]">
+          <p id="subtitle-text" class="text-base text-slate-100 leading-relaxed"></p>
+        </div>
+        <div id="subtitle-indicator" class="flex gap-1 shrink-0">
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agent Cards -->
+  <section class="mx-auto max-w-3xl px-6 pb-16 space-y-6">
+    <!-- Ms. Goodwill -->
+    <div id="goodwill-card" class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-2xl">👩‍🏫</div>
+        <div class="flex-1">
+          <h2 class="text-xl font-semibold text-violet-300">Ms. Goodwill</h2>
+          <p class="text-sm text-slate-400 mt-0.5">German mentor — briefing & reflection</p>
+          <p class="text-sm text-slate-500 mt-3">
+            Bereitet dich auf das Gespräch vor und führt die Nachbesprechung durch.
+            Spricht Schweizer Hochdeutsch.
+          </p>
+        </div>
+        <div class="flex flex-col gap-2 shrink-0">
+          <button data-agent="goodwill" data-action="start" class="rounded-lg bg-violet-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-violet-500">
+            Start Briefing
+          </button>
+          <button data-agent="goodwill" data-action="start-reflection" class="hidden rounded-lg border border-violet-500/50 px-5 py-2 text-sm font-medium text-violet-300 transition hover:bg-violet-500/10">
+            Start Reflection
+          </button>
+        </div>
+      </div>
+      <!-- Widget container -->
+      <div id="goodwill-widget" class="mt-4 hidden">
+        <div class="rounded-xl border border-slate-700 bg-slate-950/50 p-4">
+          <elevenlabs-convai
+            agent-id={GOODWILL_ID}
+            variant="expanded"
+            start-text="Talk to Ms. Goodwill"
+            brand-color="#8b5cf6"
+          ></elevenlabs-convai>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mr. Barker -->
+    <div id="barker-card" class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur opacity-50">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-2xl">🧑‍💼</div>
+        <div class="flex-1">
+          <h2 class="text-xl font-semibold text-blue-300">Mr. Barker</h2>
+          <p class="text-sm text-slate-400 mt-0.5">English customer — adaptive sales practice</p>
+          <p class="text-sm text-slate-500 mt-3">
+            A senior buyer who asks adaptive questions. 10 questions per session,
+            difficulty adjusts to your answers.
+          </p>
+        </div>
+        <div class="shrink-0">
+          <button data-agent="barker" data-action="start" disabled class="cursor-not-allowed rounded-lg bg-slate-700 px-5 py-2 text-sm font-medium text-slate-400">
+            🔒 Locked
+          </button>
+        </div>
+      </div>
+      <!-- Widget container -->
+      <div id="barker-widget" class="mt-4 hidden">
+        <div class="rounded-xl border border-slate-700 bg-slate-950/50 p-4">
+          <elevenlabs-convai
+            agent-id={BARKER_ID}
+            variant="expanded"
+            start-text="Talk to Mr. Barker"
+            brand-color="#3b82f6"
+          ></elevenlabs-convai>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transcript Log (collapsible) -->
+  <section class="mx-auto max-w-3xl px-6 pb-16">
+    <details class="rounded-2xl border border-slate-800 bg-slate-900/30 backdrop-blur">
+      <summary class="cursor-pointer px-6 py-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition">
+        📝 Full Transcript
+      </summary>
+      <div id="transcript-log" class="max-h-96 overflow-y-auto px-6 pb-4 space-y-3">
+        <p class="text-sm text-slate-600 italic">Transcript will appear here during conversations.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 py-6 text-center text-sm text-slate-600">
+    <a href="https://github.com/wagemutig/voxmachina" class="hover:text-slate-400 transition">
+      github.com/wagemutig/voxmachina
+    </a>
+  </footer>
+
+  <!-- ElevenLabs Widget Script -->
+  <script src="https://elevenlabs.io/convai-widget/index.js" async></script>
+
+  <!-- Phase Flow + Subtitle Logic -->
+  <script is:inline define:vars={{ BARKER_ID, GOODWILL_ID }}>
+    // ── State ──────────────────────────────────
+    let currentPhase = 1;
+    const transcript = [];
+
+    const phases = {
+      1: { el: document.getElementById('phase-1'), hint: 'Start with Ms. Goodwill — she\'ll brief you in German before the conversation.' },
+      2: { el: document.getElementById('phase-2'), hint: 'Now talk to Mr. Barker. He\'ll ask you 10 questions that adapt to your answers.' },
+      3: { el: document.getElementById('phase-3'), hint: 'Back to Ms. Goodwill for reflection — discuss how the conversation went.' },
+    };
+
+    function setPhase(n) {
+      currentPhase = n;
+      Object.entries(phases).forEach(([num, p]) => {
+        const isActive = Number(num) === n;
+        p.el.className = isActive
+          ? 'flex items-center gap-2 rounded-lg border border-blue-500 bg-blue-500/10 px-4 py-2 font-medium text-blue-300 transition-all'
+          : 'flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-500 transition-all';
+      });
+      document.getElementById('phase-hint').textContent = phases[n].hint;
+    }
+
+    // ── Subtitle System ────────────────────────
+    const subtitleBar = document.getElementById('subtitle-bar');
+    const subtitleText = document.getElementById('subtitle-text');
+    const subtitleIcon = document.getElementById('subtitle-speaker-icon');
+    const subtitleIndicator = document.getElementById('subtitle-indicator');
+    const transcriptLog = document.getElementById('transcript-log');
+
+    function showSubtitles(speaker, text, icon) {
+      subtitleBar.classList.remove('hidden');
+      subtitleText.textContent = text;
+      subtitleIcon.textContent = icon;
+      subtitleIcon.className = speaker === 'agent'
+        ? 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-lg'
+        : 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-lg';
+
+      // Animate indicator
+      const dots = subtitleIndicator.querySelectorAll('span');
+      dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse');
+
+      // Auto-hide after 8 seconds of no new text
+      clearTimeout(window._subtitleTimeout);
+      window._subtitleTimeout = setTimeout(() => {
+        if (subtitleText.textContent === text) {
+          dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
+        }
+      }, 8000);
+    }
+
+    function addToTranscript(speaker, text, agentName) {
+      const entry = { speaker, text, time: new Date().toLocaleTimeString(), agentName };
+      transcript.push(entry);
+
+      // Remove placeholder
+      const placeholder = transcriptLog.querySelector('.italic');
+      if (placeholder) placeholder.remove();
+
+      const div = document.createElement('div');
+      div.className = 'flex gap-3';
+      const isAgent = speaker === 'agent';
+      div.innerHTML = `
+        <div class="shrink-0 text-xs text-slate-600 pt-0.5">${entry.time}</div>
+        <div class="${isAgent ? 'text-blue-300' : 'text-violet-300'} text-sm font-medium shrink-0">
+          ${isAgent ? agentName : 'You'}:
+        </div>
+        <div class="text-sm text-slate-300 flex-1">${text}</div>
+      `;
+      transcriptLog.appendChild(div);
+      transcriptLog.scrollTop = transcriptLog.scrollHeight;
+    }
+
+    // ── Widget Event Listener ──────────────────
+    // The ElevenLabs widget dispatches events we can listen to.
+    // We hook into the conversation via the widget's callback system.
+    function attachWidgetListeners(widget, agentName, agentIcon) {
+      // The widget fires "elevenlabs-convai:call" when conversation starts
+      widget.addEventListener('elevenlabs-convai:call', (event) => {
+        // Configure client tools / callbacks
+        if (event.detail && event.detail.config) {
+          event.detail.config.onConnect = () => {
+            console.log(`Connected to ${agentName}`);
+          };
+        }
+      });
+
+      // Listen for transcript events via custom DOM events
+      // The widget bubbles up WebSocket events as CustomEvents
+      widget.addEventListener('elevenlabs-convai:user_transcript', (event) => {
+        const text = event.detail?.text || event.detail || '';
+        if (text) {
+          showSubtitles('user', text, '🎙️');
+          addToTranscript('user', text, agentName);
+        }
+      });
+
+      widget.addEventListener('elevenlabs-convai:agent_response', (event) => {
+        const text = event.detail?.text || event.detail || '';
+        if (text) {
+          showSubtitles('agent', text, agentIcon);
+          addToTranscript('agent', text, agentName);
+        }
+      });
+
+      widget.addEventListener('elevenlabs-convai:agent_response_correction', (event) => {
+        const text = event.detail?.text || event.detail || '';
+        if (text) {
+          showSubtitles('agent', text, agentIcon);
+          // Update last transcript entry
+          const last = transcript[transcript.length - 1];
+          if (last && last.speaker === 'agent') {
+            last.text = text;
+            const entries = transcriptLog.children;
+            if (entries.length > 0) {
+              const lastEntry = entries[entries.length - 1];
+              const textDiv = lastEntry.querySelector('.flex-1');
+              if (textDiv) textDiv.textContent = text;
+            }
+          }
+        }
+      });
+
+      // Also listen for conversation end
+      widget.addEventListener('elevenlabs-convai:disconnect', () => {
+        const dots = subtitleIndicator.querySelectorAll('span');
+        dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
+      });
+    }
+
+    // ── Button Handlers ────────────────────────
+    document.querySelectorAll('button[data-action="start"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const agent = btn.dataset.agent;
+
+        if (agent === 'goodwill') {
+          document.getElementById('goodwill-widget').classList.remove('hidden');
+          btn.classList.add('hidden');
+          document.querySelector('button[data-action="start-reflection"]').classList.remove('hidden');
+          setPhase(1);
+
+          // Attach listeners after widget renders
+          setTimeout(() => {
+            const widget = document.querySelector('#goodwill-widget elevenlabs-convai');
+            if (widget) attachWidgetListeners(widget, 'Ms. Goodwill', '👩‍🏫');
+          }, 500);
+        }
+
+        if (agent === 'barker') {
+          document.getElementById('barker-widget').classList.remove('hidden');
+          btn.classList.add('hidden');
+          document.getElementById('barker-card').classList.remove('opacity-50');
+          setPhase(2);
+
+          setTimeout(() => {
+            const widget = document.querySelector('#barker-widget elevenlabs-convai');
+            if (widget) attachWidgetListeners(widget, 'Mr. Barker', '🧑‍💼');
+          }, 500);
+        }
+      });
+    });
+
+    document.querySelector('button[data-action="start-reflection"]')?.addEventListener('click', () => {
+      setPhase(3);
+      document.getElementById('goodwill-card').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Auto-unlock Mr. Barker after 15s
+    setTimeout(() => {
+      const barkerBtn = document.querySelector('button[data-agent="barker"]');
+      if (barkerBtn.disabled) {
+        barkerBtn.disabled = false;
+        barkerBtn.textContent = 'Start Conversation';
+        barkerBtn.className = 'rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-500';
+        document.getElementById('barker-card').classList.remove('opacity-50');
+      }
+    }, 15000);
+  </script>
+</Layout>
