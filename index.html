@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Voice-only conversational AI training with adaptive Bloom's taxonomy questioning."><link rel="icon" type="image/svg+xml" href="/voxmachina/favicon.svg"><title>VoxMachina — Voice AI Training</title><link rel="stylesheet" href="/voxmachina/_astro/index.CzWFHXwq.css"></head> <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">   <header class="relative overflow-hidden border-b border-slate-800"> <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div> <div class="relative mx-auto max-w-3xl px-6 py-12 text-center"> <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400"> <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Voice-only conversational AI training with adaptive Bloom's taxonomy questioning."><link rel="icon" type="image/svg+xml" href="/voxmachina/favicon.svg"><title>VoxMachina — Voice AI Training</title><link rel="stylesheet" href="/voxmachina/_astro/index.DNB54Nkr.css"></head> <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">   <header class="relative overflow-hidden border-b border-slate-800"> <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div> <div class="relative mx-auto max-w-3xl px-6 py-12 text-center"> <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400"> <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
 Powered by ElevenLabs Agents
 </div> <h1 class="bg-gradient-to-r from-blue-400 via-sky-300 to-violet-400 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
 VoxMachina
@@ -29,14 +29,19 @@ A senior buyer who asks adaptive questions. 10 questions per session,
 📝 Full Transcript
 </summary> <div id="transcript-log" class="max-h-96 overflow-y-auto px-6 pb-4 space-y-3"> <p class="text-sm text-slate-600 italic">Transcript will appear here during conversations.</p> </div> </details> </section>  <footer class="border-t border-slate-800 py-6 text-center text-sm text-slate-600"> <a href="https://github.com/wagemutig/voxmachina" class="hover:text-slate-400 transition">
 github.com/wagemutig/voxmachina
-</a> </footer>  <div id="bottom-bar" class="hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700 bg-slate-950/95 backdrop-blur-lg"> <div class="mx-auto max-w-3xl px-4 py-3 space-y-2"> <!-- Subtitle Line --> <div class="flex items-center gap-3 min-h-[2rem]"> <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg">💬</div> <div class="flex-1"> <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed">Waiting for conversation to start…</p> </div> <div id="subtitle-indicator" class="flex gap-1 shrink-0"> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> </div> </div> <!-- Text Input --> <div class="flex items-center gap-2"> <input id="text-input" type="text" placeholder="Type your message…" class="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" autocomplete="off"> <button id="send-btn" class="shrink-0 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+</a> </footer>  <div id="bottom-bar" class="hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700 bg-slate-950/95 backdrop-blur-lg"> <div class="mx-auto max-w-3xl px-4 py-3 space-y-2"> <!-- Status + Subtitle Line --> <div class="flex items-center gap-3 min-h-[2rem]"> <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg">💬</div> <div class="flex-1"> <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed">Waiting for conversation to start…</p> </div> <div id="subtitle-indicator" class="flex gap-1 shrink-0"> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> <span class="h-2 w-2 rounded-full bg-slate-600"></span> </div> <button id="end-call-btn" class="hidden shrink-0 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-500">
+End Call
+</button> </div> <!-- Text Input --> <div class="flex items-center gap-2"> <input id="text-input" type="text" placeholder="Type your message…" class="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" autocomplete="off"> <button id="send-btn" class="shrink-0 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
 Send
-</button> </div> </div> </div>  <div id="widget-container" class="hidden"> <elevenlabs-convai id="voxmachina-widget" agent-id="agent_8201kvcwd293enybm2s3tpqkr9dy" start-text="Talk to Ms. Goodwill" brand-color="#8b5cf6"></elevenlabs-convai> </div>  <script src="https://elevenlabs.io/convai-widget/index.js" async></script>  <script>(function(){const BARKER_ID = "agent_1701kvcwacnje8dsehmmrsged276";
-const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
+</button> </div> </div> </div>  <script type="module">
+    import { Conversation } from 'https://esm.sh/@elevenlabs/client@latest';
+
+    const BARKER_ID = 'agent_1701kvcwacnje8dsehmmrsged276';
+    const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
 
     // ── State ──────────────────────────────────
     let currentPhase = 1;
-    let conversationActive = false;
+    let conversation = null;
     let currentAgentName = '';
     let currentAgentIcon = '';
     const transcript = [];
@@ -58,7 +63,7 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
       document.getElementById('phase-hint').textContent = phases[n].hint;
     }
 
-    // ── Bottom Bar ─────────────────────────────
+    // ── DOM refs ───────────────────────────────
     const bottomBar = document.getElementById('bottom-bar');
     const subtitleText = document.getElementById('subtitle-text');
     const subtitleIcon = document.getElementById('subtitle-speaker-icon');
@@ -66,17 +71,9 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
     const transcriptLog = document.getElementById('transcript-log');
     const textInput = document.getElementById('text-input');
     const sendBtn = document.getElementById('send-btn');
+    const endCallBtn = document.getElementById('end-call-btn');
 
-    function showBottomBar() {
-      bottomBar.classList.remove('hidden');
-      conversationActive = true;
-    }
-
-    function hideBottomBar() {
-      bottomBar.classList.add('hidden');
-      conversationActive = false;
-    }
-
+    // ── Subtitle + Transcript ──────────────────
     function showSubtitles(speaker, text, icon) {
       subtitleText.textContent = text;
       subtitleIcon.textContent = icon;
@@ -84,11 +81,9 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
         ? 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-lg'
         : 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-lg';
 
-      // Animate indicator
       const dots = subtitleIndicator.querySelectorAll('span');
       dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse');
 
-      // Auto-dim after 8 seconds
       clearTimeout(window._subtitleTimeout);
       window._subtitleTimeout = setTimeout(() => {
         if (subtitleText.textContent === text) {
@@ -118,27 +113,82 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
       transcriptLog.scrollTop = transcriptLog.scrollHeight;
     }
 
-    // ── Text Input ─────────────────────────────
-    function sendText() {
-      const text = textInput.value.trim();
-      if (!text || !conversationActive) return;
+    // ── Start Conversation ─────────────────────
+    async function startConversation(agentId, agentName, agentIcon) {
+      // End any existing conversation
+      if (conversation) {
+        try { await conversation.endSession(); } catch (e) {}
+      }
 
-      // Show user message in subtitles + transcript
+      currentAgentName = agentName;
+      currentAgentIcon = agentIcon;
+
+      // Show bottom bar
+      bottomBar.classList.remove('hidden');
+      endCallBtn.classList.remove('hidden');
+      subtitleText.textContent = `Connecting to ${agentName}…`;
+      subtitleIcon.textContent = agentIcon;
+
+      try {
+        conversation = await Conversation.startSession({
+          agentId: agentId,
+          onConnect: () => {
+            subtitleText.textContent = `Connected to ${agentName}. Start speaking or type below.`;
+          },
+          onDisconnect: () => {
+            subtitleText.textContent = 'Conversation ended.';
+            const dots = subtitleIndicator.querySelectorAll('span');
+            dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
+            endCallBtn.classList.add('hidden');
+            conversation = null;
+          },
+          onMessage: (message) => {
+            // message has: { source: 'user' | 'agent', message: string, sessionId: string }
+            if (message.source === 'user') {
+              showSubtitles('user', message.message, '🎙️');
+              addToTranscript('user', message.message, agentName);
+            } else if (message.source === 'agent') {
+              showSubtitles('agent', message.message, agentIcon);
+              addToTranscript('agent', message.message, agentName);
+            }
+          },
+          onError: (error) => {
+            console.error('Conversation error:', error);
+            subtitleText.textContent = `Error: ${error.message || error}`;
+          },
+          onStatusChange: (status) => {
+            console.log('Status:', status);
+          },
+          onModeChange: (mode) => {
+            // mode: 'speaking' | 'listening'
+            if (mode === 'speaking') {
+              subtitleIcon.textContent = agentIcon;
+            } else if (mode === 'listening') {
+              subtitleIcon.textContent = '👂';
+            }
+          },
+        });
+      } catch (err) {
+        console.error('Failed to start conversation:', err);
+        subtitleText.textContent = `Failed to connect: ${err.message || err}`;
+      }
+    }
+
+    // ── Text Input ─────────────────────────────
+    async function sendText() {
+      const text = textInput.value.trim();
+      if (!text || !conversation) return;
+
+      // Show user message immediately
       showSubtitles('user', text, '🎙️');
       addToTranscript('user', text, currentAgentName);
 
-      // Send to widget — dispatch a custom event
-      const widget = document.getElementById('voxmachina-widget');
-      widget.dispatchEvent(new CustomEvent('elevenlabs-convai:user_input', {
-        detail: { text },
-        bubbles: true,
-      }));
-
-      // Also try sending via the widget's API if available
-      if (widget.sendTextMessage) {
-        widget.sendTextMessage(text);
-      } else if (widget.conversation && widget.conversation.sendText) {
-        widget.conversation.sendText(text);
+      // Send via SDK
+      try {
+        await conversation.sendUserMessage(text);
+      } catch (err) {
+        console.error('Failed to send message:', err);
+        subtitleText.textContent = `Failed to send: ${err.message || err}`;
       }
 
       textInput.value = '';
@@ -151,94 +201,36 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
         sendText();
       }
     });
+    textInput.addEventListener('input', () => {
+      if (conversation) {
+        conversation.sendUserActivity();
+      }
+    });
 
-    // ── Widget Event Listener ──────────────────
-    function attachWidgetListeners(widget, agentName, agentIcon) {
-      widget.addEventListener('elevenlabs-convai:call', (event) => {
-        showBottomBar();
-        if (event.detail && event.detail.config) {
-          event.detail.config.onConnect = () => {
-            console.log(`Connected to ${agentName}`);
-          };
-        }
-      });
-
-      widget.addEventListener('elevenlabs-convai:user_transcript', (event) => {
-        const text = event.detail?.text || event.detail || '';
-        if (text) {
-          showSubtitles('user', text, '🎙️');
-          addToTranscript('user', text, agentName);
-        }
-      });
-
-      widget.addEventListener('elevenlabs-convai:agent_response', (event) => {
-        const text = event.detail?.text || event.detail || '';
-        if (text) {
-          showSubtitles('agent', text, agentIcon);
-          addToTranscript('agent', text, agentName);
-        }
-      });
-
-      widget.addEventListener('elevenlabs-convai:agent_response_correction', (event) => {
-        const text = event.detail?.text || event.detail || '';
-        if (text) {
-          showSubtitles('agent', text, agentIcon);
-          const last = transcript[transcript.length - 1];
-          if (last && last.speaker === 'agent') {
-            last.text = text;
-            const entries = transcriptLog.children;
-            if (entries.length > 0) {
-              const lastEntry = entries[entries.length - 1];
-              const textDiv = lastEntry.querySelector('.flex-1');
-              if (textDiv) textDiv.textContent = text;
-            }
-          }
-        }
-      });
-
-      widget.addEventListener('elevenlabs-convai:disconnect', () => {
-        const dots = subtitleIndicator.querySelectorAll('span');
-        dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
-        subtitleText.textContent = 'Conversation ended. Click an agent to start a new one.';
-      });
-    }
-
-    // ── Agent Switching ────────────────────────
-    const widgetContainer = document.getElementById('widget-container');
-    const widget = document.getElementById('voxmachina-widget');
-
-    function switchAgent(agentId, agentName, agentIcon, brandColor) {
-      currentAgentName = agentName;
-      currentAgentIcon = agentIcon;
-
-      widget.setAttribute('agent-id', agentId);
-      widget.setAttribute('brand-color', brandColor);
-      widget.setAttribute('start-text', `Talk to ${agentName}`);
-
-      widgetContainer.classList.remove('hidden');
-      showBottomBar();
-      subtitleText.textContent = `Click the floating button to start talking with ${agentName}.`;
-
-      attachWidgetListeners(widget, agentName, agentIcon);
-    }
+    // ── End Call ───────────────────────────────
+    endCallBtn.addEventListener('click', async () => {
+      if (conversation) {
+        try { await conversation.endSession(); } catch (e) {}
+      }
+    });
 
     // ── Button Handlers ────────────────────────
     document.querySelectorAll('button[data-action="start"]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const agent = btn.dataset.agent;
 
         if (agent === 'goodwill') {
           btn.classList.add('hidden');
           document.querySelector('button[data-action="start-reflection"]').classList.remove('hidden');
           setPhase(1);
-          switchAgent(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', '#8b5cf6');
+          await startConversation(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫');
         }
 
         if (agent === 'barker') {
           btn.classList.add('hidden');
           document.getElementById('barker-card').classList.remove('opacity-50');
           setPhase(2);
-          switchAgent(BARKER_ID, 'Mr. Barker', '🧑‍💼', '#3b82f6');
+          await startConversation(BARKER_ID, 'Mr. Barker', '🧑‍💼');
         }
       });
     });
@@ -258,4 +250,4 @@ const GOODWILL_ID = "agent_8201kvcwd293enybm2s3tpqkr9dy";
         document.getElementById('barker-card').classList.remove('opacity-50');
       }
     }, 15000);
-  })();</script>  </body></html>
+  </script>  </body></html>
