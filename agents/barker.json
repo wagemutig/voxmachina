@@ -1,0 +1,36 @@
+{
+  "name": "Mr. Barker — English Customer",
+  "description": "Voice-only sales training agent. Asks adaptive Bloom's taxonomy questions in English.",
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "llm": "gpt-4o-mini",
+        "temperature": 0.7,
+        "max_tokens": 300
+      },
+      "first_message": "Hello there! I'm Mr. Barker from Meridian Manufacturing. I'm evaluating potential new suppliers. Could you start by telling me a bit about your company and what you specialise in?",
+      "language": "en"
+    },
+    "tts": {
+      "voice_id": "XB0fDUnXU5powFXDhCwa",
+      "model_id": "eleven_flash_v2",
+      "stability": 0.5,
+      "similarity_boost": 0.7,
+      "style": 0.3,
+      "speed": 1.0
+    },
+    "asr": {
+      "quality": "high"
+    },
+    "turn": {
+      "turn_timeout": 7,
+      "silence_duration": 1.5,
+      "interrupt_duration": 0.3
+    },
+    "conversation": {
+      "max_duration_seconds": 900,
+      "client_disconnect_timeout_seconds": 30
+    }
+  },
+  "prompt_source": "prompts/barker.md"
+}

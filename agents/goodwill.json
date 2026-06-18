@@ -1,0 +1,36 @@
+{
+  "name": "Ms. Goodwill — German Mentor",
+  "description": "Voice-only training mentor. Briefs in German before sessions, leads reflection after.",
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "llm": "gpt-4o-mini",
+        "temperature": 0.7,
+        "max_tokens": 300
+      },
+      "first_message": "Hallo! Ich bin Frau Goodwill. Schön, dass du bereit bist für dein Training. Ich möchte dich kurz auf das Gespräch mit Mr. Barker vorbereiten — dann starten wir.",
+      "language": "de"
+    },
+    "tts": {
+      "voice_id": "EXAVITQu4vr4xnSDxMaL",
+      "model_id": "eleven_flash_v2_5",
+      "stability": 0.5,
+      "similarity_boost": 0.7,
+      "style": 0.3,
+      "speed": 1.0
+    },
+    "asr": {
+      "quality": "high"
+    },
+    "turn": {
+      "turn_timeout": 7,
+      "silence_duration": 1.5,
+      "interrupt_duration": 0.3
+    },
+    "conversation": {
+      "max_duration_seconds": 900,
+      "client_disconnect_timeout_seconds": 30
+    }
+  },
+  "prompt_source": "prompts/goodwill.md"
+}

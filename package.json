@@ -2,6 +2,7 @@
   "name": "voxmachina",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Voice-only conversational AI training bot with ElevenLabs Agents",
   "scripts": {
     "start:barker": "node src/index.js --agent barker",
