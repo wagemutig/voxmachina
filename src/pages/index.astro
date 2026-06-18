@@ -47,23 +47,6 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
     </p>
   </section>
 
-  <!-- Live Subtitles Bar -->
-  <section class="mx-auto max-w-3xl px-6 pb-4">
-    <div id="subtitle-bar" class="hidden rounded-xl border border-slate-700 bg-slate-900/80 p-4 backdrop-blur sticky top-0 z-50">
-      <div class="flex items-center gap-3">
-        <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg"></div>
-        <div class="flex-1 min-h-[1.5rem]">
-          <p id="subtitle-text" class="text-base text-slate-100 leading-relaxed"></p>
-        </div>
-        <div id="subtitle-indicator" class="flex gap-1 shrink-0">
-          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
-          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
-          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Agent Cards -->
   <section class="mx-auto max-w-3xl px-6 pb-16 space-y-6">
     <!-- Ms. Goodwill -->
@@ -87,17 +70,6 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
           </button>
         </div>
       </div>
-      <!-- Widget container -->
-      <div id="goodwill-widget" class="mt-4 hidden">
-        <div class="rounded-xl border border-slate-700 bg-slate-950/50 p-4">
-          <elevenlabs-convai
-            agent-id={GOODWILL_ID}
-            variant="expanded"
-            start-text="Talk to Ms. Goodwill"
-            brand-color="#8b5cf6"
-          ></elevenlabs-convai>
-        </div>
-      </div>
     </div>
 
     <!-- Mr. Barker -->
@@ -118,22 +90,11 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
           </button>
         </div>
       </div>
-      <!-- Widget container -->
-      <div id="barker-widget" class="mt-4 hidden">
-        <div class="rounded-xl border border-slate-700 bg-slate-950/50 p-4">
-          <elevenlabs-convai
-            agent-id={BARKER_ID}
-            variant="expanded"
-            start-text="Talk to Mr. Barker"
-            brand-color="#3b82f6"
-          ></elevenlabs-convai>
-        </div>
-      </div>
     </div>
   </section>
 
   <!-- Transcript Log (collapsible) -->
-  <section class="mx-auto max-w-3xl px-6 pb-16">
+  <section class="mx-auto max-w-3xl px-6 pb-32">
     <details class="rounded-2xl border border-slate-800 bg-slate-900/30 backdrop-blur">
       <summary class="cursor-pointer px-6 py-4 text-sm font-medium text-slate-400 hover:text-slate-300 transition">
         📝 Full Transcript
@@ -151,13 +112,55 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
     </a>
   </footer>
 
-  <!-- ElevenLabs Widget Script -->
-  <script src="https://elevenlabs.io/convai-widget/index.js" async></script>
+  <!-- ── Fixed Bottom Bar: Subtitles + Text Input ── -->
+  <div id="bottom-bar" class="hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700 bg-slate-950/95 backdrop-blur-lg">
+    <div class="mx-auto max-w-3xl px-4 py-3 space-y-2">
 
-  <!-- Phase Flow + Subtitle Logic -->
-  <script is:inline define:vars={{ BARKER_ID, GOODWILL_ID }}>
+      <!-- Status + Subtitle Line -->
+      <div class="flex items-center gap-3 min-h-[2rem]">
+        <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg">💬</div>
+        <div class="flex-1">
+          <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed">Waiting for conversation to start…</p>
+        </div>
+        <div id="subtitle-indicator" class="flex gap-1 shrink-0">
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+        </div>
+        <button id="end-call-btn" class="hidden shrink-0 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-500">
+          End Call
+        </button>
+      </div>
+
+      <!-- Text Input -->
+      <div class="flex items-center gap-2">
+        <input
+          id="text-input"
+          type="text"
+          placeholder="Type your message…"
+          class="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          autocomplete="off"
+        />
+        <button id="send-btn" class="shrink-0 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+          Send
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ElevenLabs JS SDK -->
+  <script type="module">
+    import { Conversation } from 'https://esm.sh/@elevenlabs/client@latest';
+
+    const BARKER_ID = 'agent_1701kvcwacnje8dsehmmrsged276';
+    const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
+
     // ── State ──────────────────────────────────
     let currentPhase = 1;
+    let conversation = null;
+    let currentAgentName = '';
+    let currentAgentIcon = '';
     const transcript = [];
 
     const phases = {
@@ -177,26 +180,27 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       document.getElementById('phase-hint').textContent = phases[n].hint;
     }
 
-    // ── Subtitle System ────────────────────────
-    const subtitleBar = document.getElementById('subtitle-bar');
+    // ── DOM refs ───────────────────────────────
+    const bottomBar = document.getElementById('bottom-bar');
     const subtitleText = document.getElementById('subtitle-text');
     const subtitleIcon = document.getElementById('subtitle-speaker-icon');
     const subtitleIndicator = document.getElementById('subtitle-indicator');
     const transcriptLog = document.getElementById('transcript-log');
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send-btn');
+    const endCallBtn = document.getElementById('end-call-btn');
 
+    // ── Subtitle + Transcript ──────────────────
     function showSubtitles(speaker, text, icon) {
-      subtitleBar.classList.remove('hidden');
       subtitleText.textContent = text;
       subtitleIcon.textContent = icon;
       subtitleIcon.className = speaker === 'agent'
         ? 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-lg'
         : 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-lg';
 
-      // Animate indicator
       const dots = subtitleIndicator.querySelectorAll('span');
       dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse');
 
-      // Auto-hide after 8 seconds of no new text
       clearTimeout(window._subtitleTimeout);
       window._subtitleTimeout = setTimeout(() => {
         if (subtitleText.textContent === text) {
@@ -209,7 +213,6 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       const entry = { speaker, text, time: new Date().toLocaleTimeString(), agentName };
       transcript.push(entry);
 
-      // Remove placeholder
       const placeholder = transcriptLog.querySelector('.italic');
       if (placeholder) placeholder.remove();
 
@@ -227,91 +230,151 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       transcriptLog.scrollTop = transcriptLog.scrollHeight;
     }
 
-    // ── Widget Event Listener ──────────────────
-    // The ElevenLabs widget dispatches events we can listen to.
-    // We hook into the conversation via the widget's callback system.
-    function attachWidgetListeners(widget, agentName, agentIcon) {
-      // The widget fires "elevenlabs-convai:call" when conversation starts
-      widget.addEventListener('elevenlabs-convai:call', (event) => {
-        // Configure client tools / callbacks
-        if (event.detail && event.detail.config) {
-          event.detail.config.onConnect = () => {
-            console.log(`Connected to ${agentName}`);
-          };
-        }
-      });
+    // ── Start Conversation ─────────────────────
+    async function startConversation(agentId, agentName, agentIcon) {
+      // End any existing conversation
+      if (conversation) {
+        try { await conversation.endSession(); } catch (e) {}
+      }
 
-      // Listen for transcript events via custom DOM events
-      // The widget bubbles up WebSocket events as CustomEvents
-      widget.addEventListener('elevenlabs-convai:user_transcript', (event) => {
-        const text = event.detail?.text || event.detail || '';
-        if (text) {
-          showSubtitles('user', text, '🎙️');
-          addToTranscript('user', text, agentName);
-        }
-      });
+      currentAgentName = agentName;
+      currentAgentIcon = agentIcon;
 
-      widget.addEventListener('elevenlabs-convai:agent_response', (event) => {
-        const text = event.detail?.text || event.detail || '';
-        if (text) {
-          showSubtitles('agent', text, agentIcon);
-          addToTranscript('agent', text, agentName);
-        }
-      });
+      // Reset partial text buffer
+      window._agentPartialText = '';
 
-      widget.addEventListener('elevenlabs-convai:agent_response_correction', (event) => {
-        const text = event.detail?.text || event.detail || '';
-        if (text) {
-          showSubtitles('agent', text, agentIcon);
-          // Update last transcript entry
-          const last = transcript[transcript.length - 1];
-          if (last && last.speaker === 'agent') {
-            last.text = text;
-            const entries = transcriptLog.children;
-            if (entries.length > 0) {
-              const lastEntry = entries[entries.length - 1];
-              const textDiv = lastEntry.querySelector('.flex-1');
-              if (textDiv) textDiv.textContent = text;
+      // Show bottom bar
+      bottomBar.classList.remove('hidden');
+      endCallBtn.classList.remove('hidden');
+      subtitleText.textContent = `Connecting to ${agentName}…`;
+      subtitleIcon.textContent = agentIcon;
+
+      try {
+        conversation = await Conversation.startSession({
+          agentId: agentId,
+          onConnect: () => {
+            subtitleText.textContent = `Connected to ${agentName}. Start speaking or type below.`;
+          },
+          onDisconnect: () => {
+            subtitleText.textContent = 'Conversation ended.';
+            const dots = subtitleIndicator.querySelectorAll('span');
+            dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
+            endCallBtn.classList.add('hidden');
+            conversation = null;
+          },
+          onMessage: (message) => {
+            // SDK sends { source: 'user' | 'ai', role, message, event_id }
+            if (message.source === 'user') {
+              // Reset agent partial text when user speaks
+              window._agentPartialText = '';
+              showSubtitles('user', message.message, '🎙️');
+              addToTranscript('user', message.message, agentName);
+            } else if (message.source === 'ai') {
+              // Full agent response — reset partial buffer and show final text
+              window._agentPartialText = '';
+              showSubtitles('agent', message.message, agentIcon);
+              addToTranscript('agent', message.message, agentName);
             }
-          }
-        }
-      });
-
-      // Also listen for conversation end
-      widget.addEventListener('elevenlabs-convai:disconnect', () => {
-        const dots = subtitleIndicator.querySelectorAll('span');
-        dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
-      });
+          },
+          // Live streaming: each text chunk as the agent generates it
+          onAgentChatResponsePart: (part) => {
+            // part is { text: string, part_id: string, is_final: boolean }
+            const text = part.text || part;
+            // Update subtitle in real-time (accumulate partial text)
+            if (!window._agentPartialText) window._agentPartialText = '';
+            if (part.is_final) {
+              window._agentPartialText += text;
+            } else {
+              window._agentPartialText = text;
+            }
+            showSubtitles('agent', window._agentPartialText || text, agentIcon);
+          },
+          // Agent response correction (e.g. if agent rephrases)
+          onAgentResponseCorrection: (correction) => {
+            if (correction?.corrected_agent_response) {
+              showSubtitles('agent', correction.corrected_agent_response, agentIcon);
+            }
+          },
+          onError: (error) => {
+            console.error('Conversation error:', error);
+            subtitleText.textContent = `Error: ${error.message || error}`;
+          },
+          onStatusChange: (status) => {
+            console.log('Status:', status);
+          },
+          onModeChange: (mode) => {
+            // mode: 'speaking' | 'listening'
+            if (mode === 'speaking') {
+              subtitleIcon.textContent = agentIcon;
+            } else if (mode === 'listening') {
+              subtitleIcon.textContent = '👂';
+            }
+          },
+        });
+      } catch (err) {
+        console.error('Failed to start conversation:', err);
+        subtitleText.textContent = `Failed to connect: ${err.message || err}`;
+      }
     }
+
+    // ── Text Input ─────────────────────────────
+    async function sendText() {
+      const text = textInput.value.trim();
+      if (!text || !conversation) return;
+
+      // Show user message immediately and reset agent partial
+      window._agentPartialText = '';
+      showSubtitles('user', text, '🎙️');
+      addToTranscript('user', text, currentAgentName);
+
+      // Send via SDK
+      try {
+        await conversation.sendUserMessage(text);
+      } catch (err) {
+        console.error('Failed to send message:', err);
+        subtitleText.textContent = `Failed to send: ${err.message || err}`;
+      }
+
+      textInput.value = '';
+    }
+
+    sendBtn.addEventListener('click', sendText);
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendText();
+      }
+    });
+    textInput.addEventListener('input', () => {
+      if (conversation) {
+        conversation.sendUserActivity();
+      }
+    });
+
+    // ── End Call ───────────────────────────────
+    endCallBtn.addEventListener('click', async () => {
+      if (conversation) {
+        try { await conversation.endSession(); } catch (e) {}
+      }
+    });
 
     // ── Button Handlers ────────────────────────
     document.querySelectorAll('button[data-action="start"]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const agent = btn.dataset.agent;
 
         if (agent === 'goodwill') {
-          document.getElementById('goodwill-widget').classList.remove('hidden');
           btn.classList.add('hidden');
           document.querySelector('button[data-action="start-reflection"]').classList.remove('hidden');
           setPhase(1);
-
-          // Attach listeners after widget renders
-          setTimeout(() => {
-            const widget = document.querySelector('#goodwill-widget elevenlabs-convai');
-            if (widget) attachWidgetListeners(widget, 'Ms. Goodwill', '👩‍🏫');
-          }, 500);
+          await startConversation(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫');
         }
 
         if (agent === 'barker') {
-          document.getElementById('barker-widget').classList.remove('hidden');
           btn.classList.add('hidden');
           document.getElementById('barker-card').classList.remove('opacity-50');
           setPhase(2);
-
-          setTimeout(() => {
-            const widget = document.querySelector('#barker-widget elevenlabs-convai');
-            if (widget) attachWidgetListeners(widget, 'Mr. Barker', '🧑‍💼');
-          }, 500);
+          await startConversation(BARKER_ID, 'Mr. Barker', '🧑‍💼');
         }
       });
     });
