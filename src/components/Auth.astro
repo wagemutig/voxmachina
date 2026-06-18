@@ -1,0 +1,76 @@
+<div id="auth-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+  <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#1e293b]/95 p-6 shadow-2xl">
+    <h3 class="text-center text-xl font-bold text-white mb-1">Account</h3>
+    <p class="text-center text-sm text-slate-400 mb-6">Sign in to save your conversation history</p>
+
+    <!-- Magic Link Form -->
+    <div id="auth-magic-link-form">
+      <input id="auth-email" type="email" placeholder="your@email.com"
+        class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500/50 mb-3">
+      <button id="auth-send-magic-link"
+        class="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition-colors">
+        Send Magic Link
+      </button>
+      <p class="text-center text-xs text-slate-500 mt-3">Or <button id="auth-show-password" class="text-blue-400 hover:underline">use password</button></p>
+    </div>
+
+    <!-- Password Form (hidden by default) -->
+    <div id="auth-password-form" class="hidden">
+      <input id="auth-email-pw" type="email" placeholder="your@email.com"
+        class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500/50 mb-3">
+      <input id="auth-password" type="password" placeholder="Password (min 6 chars)"
+        class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500/50 mb-3">
+      <div class="flex gap-2 mb-3">
+        <button id="auth-signin-pw"
+          class="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition-colors">
+          Sign In
+        </button>
+        <button id="auth-signup-pw"
+          class="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+          Sign Up
+        </button>
+      </div>
+      <p class="text-center text-xs text-slate-500"><button id="auth-show-magic" class="text-blue-400 hover:underline">Use magic link instead</button></p>
+    </div>
+
+    <!-- Magic Link Sent Message -->
+    <div id="auth-magic-sent" class="hidden text-center">
+      <p class="text-green-400 text-sm mb-2">✓ Magic link sent!</p>
+      <p class="text-slate-400 text-xs">Check your email and click the link to sign in.</p>
+    </div>
+
+    <button id="auth-cancel" class="mt-4 w-full rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-400 hover:bg-white/5 transition-colors">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- User Menu (shown when logged in) -->
+<div id="user-menu" class="hidden fixed top-4 right-4 z-[60]">
+  <button id="user-menu-btn" class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white hover:bg-white/10 transition-colors">
+    <span id="user-avatar">👤</span>
+    <span id="user-email" class="max-w-[120px] truncate"></span>
+    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-[#1e293b] shadow-2xl overflow-hidden">
+    <button id="user-history" class="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-white/5 transition-colors">
+      📜 Conversation History
+    </button>
+    <button id="user-logout" class="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-white/5 transition-colors">
+      Sign Out
+    </button>
+  </div>
+</div>
+
+<!-- Conversation History Sidebar -->
+<div id="history-sidebar" class="hidden fixed inset-y-0 right-0 z-[70] w-80 border-l border-white/10 bg-[#0f172a]/95 backdrop-blur-md shadow-2xl transform transition-transform duration-300 translate-x-full">
+  <div class="flex items-center justify-between p-4 border-b border-white/10">
+    <h3 class="text-lg font-bold text-white">History</h3>
+    <button id="history-close" class="text-slate-400 hover:text-white transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="history-list" class="p-4 space-y-3 overflow-y-auto" style="max-height: calc(100vh - 80px);">
+    <p class="text-center text-sm text-slate-500">No conversations yet</p>
+  </div>
+</div>

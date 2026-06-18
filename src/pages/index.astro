@@ -1,27 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-const BARKER_ID = ''; // Fetched from API after PIN
-const GOODWILL_ID = ''; // Fetched from API after PIN
+import Auth from '../components/Auth.astro';
 ---
 
 <Layout title="VoxMachina — Voice AI Training">
   <style>
-    /* iOS Safari fixes */
-    .chat-container {
-      height: 100dvh;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    .chat-messages {
-      -webkit-overflow-scrolling: touch;
-    }
-    /* Prevent body scroll when chat is open */
-    body.chat-open {
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
-    }
+    .chat-container { height: 100dvh; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .chat-messages { -webkit-overflow-scrolling: touch; }
+    body.chat-open { overflow: hidden; position: fixed; width: 100%; }
   </style>
+
+  <!-- ═══════ AUTH COMPONENTS ═══════ -->
+  <Auth />
 
   <!-- ═══════ LANDING VIEW ═══════ -->
   <div id="landing-view" class="min-h-[100dvh] flex flex-col">
@@ -40,6 +30,11 @@ const GOODWILL_ID = ''; // Fetched from API after PIN
           Voice-only conversational AI training. Practice sales pitches with an
           adaptive English customer, guided by a German mentor.
         </p>
+        <div id="auth-status-bar" class="mt-4 hidden">
+          <button id="auth-signin-btn" class="inline-flex items-center gap-2 rounded-lg bg-blue-600/20 border border-blue-500/30 px-4 py-2 text-sm text-blue-300 hover:bg-blue-600/30 transition">
+            Sign in to save conversations
+          </button>
+        </div>
       </div>
     </header>
 
@@ -118,14 +113,11 @@ const GOODWILL_ID = ''; // Fetched from API after PIN
     </footer>
   </div>
 
-  <!-- ═══════ CHAT VIEW (full-screen overlay) ═══════ -->
+  <!-- ═══════ CHAT VIEW ═══════ -->
   <div id="chat-view" class="chat-container hidden fixed inset-0 z-50 flex flex-col bg-slate-950">
-    <!-- Chat Header -->
     <div class="shrink-0 border-b border-slate-800 bg-slate-900/80 backdrop-blur" style="padding-top: env(safe-area-inset-top, 0px);">
       <div class="flex items-center gap-3 px-4 py-3">
-        <button id="chat-back-btn" class="shrink-0 rounded-lg p-2 text-slate-400 hover:bg-slate-800 transition">
-          ←
-        </button>
+        <button id="chat-back-btn" class="shrink-0 rounded-lg p-2 text-slate-400 hover:bg-slate-800 transition">←</button>
         <div id="chat-agent-icon" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xl">💬</div>
         <div class="flex-1 min-w-0">
           <h2 id="chat-agent-name" class="text-sm font-semibold text-slate-100 truncate">Agent</h2>
@@ -135,61 +127,25 @@ const GOODWILL_ID = ''; // Fetched from API after PIN
           <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span>
           <span id="chat-mode-text">Idle</span>
         </div>
-        <button id="mute-btn" class="hidden shrink-0 rounded-lg bg-slate-800 p-2 text-slate-300 transition hover:bg-slate-700" title="Mute">
-          🎙️
-        </button>
+        <button id="mute-btn" class="hidden shrink-0 rounded-lg bg-slate-800 p-2 text-slate-300 transition hover:bg-slate-700" title="Mute">🎙️</button>
       </div>
     </div>
 
-    <!-- Chat Messages -->
     <div id="chat-messages" class="chat-messages flex-1 overflow-y-auto px-4 py-4 space-y-3">
       <p class="text-center text-sm text-slate-600">Connecting…</p>
     </div>
 
-    <!-- Live Subtitle (voice mode only) -->
     <div id="subtitle-bar" class="hidden shrink-0 border-t border-slate-800 bg-slate-900/60 px-4 py-2">
       <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed break-words text-center"></p>
     </div>
 
-    <!-- Chat Input -->
     <div class="shrink-0 border-t border-slate-800 bg-slate-900/80 backdrop-blur px-3 py-2" style="padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);">
       <div class="flex items-end gap-2">
-        <input
-          id="text-input"
-          type="text"
-          placeholder="Type your message…"
+        <input id="text-input" type="text" placeholder="Type your message…"
           class="flex-1 min-w-0 rounded-2xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
-          autocomplete="off"
-        />
-        <button id="send-btn" class="shrink-0 rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
-          Send
-        </button>
+          autocomplete="off" />
+        <button id="send-btn" class="shrink-0 rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">Send</button>
       </div>
-    </div>
-  </div>
-
-  <!-- ═══════ PIN GATE MODAL ═══════ -->
-  <div id="pin-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-    <div class="w-full max-w-xs rounded-2xl border border-slate-700 bg-slate-900 p-6 text-center">
-      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-violet-500/20 text-2xl">🔒</div>
-      <h3 class="text-lg font-semibold text-slate-100 mb-1">Access Code</h3>
-      <p class="text-sm text-slate-500 mb-5">Enter PIN to start a conversation</p>
-      <input
-        id="pin-input"
-        type="tel"
-        inputmode="numeric"
-        maxlength="4"
-        placeholder="••••"
-        class="w-full text-center text-2xl tracking-[0.5em] rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:outline-none"
-        autocomplete="off"
-      />
-      <p id="pin-error" class="hidden text-xs text-red-400 mt-2">Wrong PIN. Try again.</p>
-      <button id="pin-submit" class="mt-4 w-full rounded-xl bg-violet-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-violet-500">
-        Unlock
-      </button>
-      <button id="pin-cancel" class="mt-3 w-full text-center text-sm text-slate-500 hover:text-slate-300 transition">
-        Cancel
-      </button>
     </div>
   </div>
 
@@ -197,463 +153,499 @@ const GOODWILL_ID = ''; // Fetched from API after PIN
   <div id="mode-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
     <div class="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6">
       <h3 class="text-lg font-semibold text-slate-100 text-center mb-1">Start Conversation</h3>
-      <p id="modal-agent-name" class="text-sm text-slate-400 text-center mb-6">Choose how you want to talk</p>
+      <p id="mode-modal-subtitle" class="text-center text-sm text-slate-500 mb-5">Choose how you want to talk</p>
       <div class="space-y-3">
-        <button id="voice-btn" class="w-full flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800 p-4 transition hover:border-blue-500 hover:bg-slate-750">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-xl">🎙️</div>
-          <div class="text-left flex-1">
-            <div class="text-sm font-medium text-slate-100">Voice</div>
-            <div class="text-xs text-slate-500">Talk with your microphone</div>
+        <button id="mode-voice" class="w-full flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-3 text-left transition hover:border-blue-500/50 hover:bg-slate-800">
+          <span class="text-2xl">🎙️</span>
+          <div>
+            <p class="font-medium text-slate-200">Voice</p>
+            <p class="text-xs text-slate-500">Talk with your microphone</p>
           </div>
         </button>
-        <button id="text-btn" class="w-full flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800 p-4 transition hover:border-violet-500 hover:bg-slate-750">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-xl">⌨️</div>
-          <div class="text-left flex-1">
-            <div class="text-sm font-medium text-slate-100">Text only</div>
-            <div class="text-xs text-slate-500">No microphone needed</div>
+        <button id="mode-text" class="w-full flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-3 text-left transition hover:border-blue-500/50 hover:bg-slate-800">
+          <span class="text-2xl">⌨️</span>
+          <div>
+            <p class="font-medium text-slate-200">Text</p>
+            <p class="text-xs text-slate-500">No microphone needed</p>
           </div>
         </button>
       </div>
-      <button id="modal-cancel" class="mt-4 w-full text-center text-sm text-slate-500 hover:text-slate-300 transition">
-        Cancel
-      </button>
+      <button id="mode-cancel" class="mt-4 w-full rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:bg-slate-800 transition">Cancel</button>
     </div>
   </div>
 
-  <!-- ═══════ TRANSITION MODAL (Goodwill → Barker) ═══════ -->
-  <div id="transition-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  <!-- ═══════ TRANSITION MODAL ═══════ -->
+  <div id="transition-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
     <div class="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6 text-center">
-      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/20 text-3xl">🧑‍💼</div>
-      <h3 class="text-lg font-semibold text-slate-100 mb-1">Ready for Mr. Barker?</h3>
-      <p class="text-sm text-slate-400 mb-6">Briefing complete. Now practice your sales pitch with Mr. Barker — he'll ask adaptive questions that adjust to your answers.</p>
-      <button id="transition-continue" class="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-500">
-        Start Conversation →
-      </button>
-      <button id="transition-cancel" class="mt-3 w-full text-center text-sm text-slate-500 hover:text-slate-300 transition">
-        Not now
-      </button>
+      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/20 text-2xl">🎉</div>
+      <h3 class="text-lg font-semibold text-slate-100 mb-2">Conversation Complete!</h3>
+      <p class="text-sm text-slate-400 mb-5">Ready to talk with Mr. Barker?</p>
+      <div class="space-y-2">
+        <button id="trans-continue" class="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-500">Continue with Mr. Barker</button>
+        <button id="trans-cancel" class="w-full rounded-xl border border-slate-700 px-5 py-3 text-sm text-slate-400 transition hover:bg-slate-800">Back to Menu</button>
+      </div>
     </div>
   </div>
 
-  <!-- ═══════ SCRIPT ═══════ -->
   <script type="module">
-    import { Conversation } from 'https://esm.sh/@elevenlabs/client@1.11.2';
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-    const BARKER_ID = ''; // Fetched after PIN auth
-    const GOODWILL_ID = ''; // Fetched after PIN auth
-    let agentIds = { barker: '', goodwill: '' };
+    const SUPABASE_URL = 'https://beuvflymiodgodeqksyh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_BPIAtbeuvflymiodgodeqksyh';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
+    });
 
-    // ── State ──────────────────────────
-    let conversation = null;
-    let currentAgentName = '';
-    let currentAgentIcon = '';
-    let currentAgentId = '';
-    let currentPhase = 1; // 1=briefing, 2=conversation, 3=reflection
-    let isTextMode = false;
-    let isMuted = false;
-    let agentPartialText = '';
-    let lastTextMode = false; // remember user's mode preference
+    const BARKER_ID = 'agent_9601kvdjdvqefd99es8881mc4z9g';
+    const GOODWILL_ID = 'agent_5001kvdjcj2ke88aenh6yq6wh02h';
 
-    // ── DOM refs ───────────────────────
-    const landingView = document.getElementById('landing-view');
-    const chatView = document.getElementById('chat-view');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatAgentName = document.getElementById('chat-agent-name');
-    const chatAgentIcon = document.getElementById('chat-agent-icon');
-    const chatStatus = document.getElementById('chat-status');
-    const chatModeIndicator = document.getElementById('chat-mode-indicator');
-    const chatModeText = document.getElementById('chat-mode-text');
-    const subtitleBar = document.getElementById('subtitle-bar');
-    const subtitleText = document.getElementById('subtitle-text');
-    const textInput = document.getElementById('text-input');
-    const sendBtn = document.getElementById('send-btn');
-    const muteBtn = document.getElementById('mute-btn');
-    const chatBackBtn = document.getElementById('chat-back-btn');
-    const modeModal = document.getElementById('mode-modal');
-    const modalAgentName = document.getElementById('modal-agent-name');
-    const voiceBtn = document.getElementById('voice-btn');
-    const textBtn = document.getElementById('text-btn');
-    const modalCancel = document.getElementById('modal-cancel');
-    const transitionModal = document.getElementById('transition-modal');
-    const transitionContinue = document.getElementById('transition-continue');
-    const transitionCancel = document.getElementById('transition-cancel');
-    const pinModal = document.getElementById('pin-modal');
-    const pinInput = document.getElementById('pin-input');
-    const pinError = document.getElementById('pin-error');
-    const pinSubmit = document.getElementById('pin-submit');
-    const pinCancel = document.getElementById('pin-cancel');
-    let pinUnlocked = false;
-    let pendingAgent = null; // { id, name, icon, phase }
+    let currentUser = null;
+    let currentConversationId = null;
+    let conversationMessages = [];
 
-    // ── Phase management ───────────────
-    const phases = {
-      1: { el: document.getElementById('phase-1'), hint: 'Start with Ms. Goodwill — she\'ll brief you in German before the conversation.' },
-      2: { el: document.getElementById('phase-2'), hint: 'Now talk to Mr. Barker. He\'ll ask you 10 questions that adapt to your answers.' },
-      3: { el: document.getElementById('phase-3'), hint: 'Back to Ms. Goodwill for reflection — discuss how the conversation went.' },
-    };
-
-    function setPhase(n) {
-      Object.entries(phases).forEach(([num, p]) => {
-        const isActive = Number(num) === n;
-        p.el.className = isActive
-          ? 'flex items-center gap-1.5 sm:gap-2 rounded-lg border border-blue-500 bg-blue-500/10 px-2.5 sm:px-4 py-1.5 sm:py-2 font-medium text-blue-300 transition-all'
-          : 'flex items-center gap-1.5 sm:gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2.5 sm:px-4 py-1.5 sm:py-2 text-slate-500 transition-all';
-      });
-      document.getElementById('phase-hint').textContent = phases[n].hint;
-    }
-
-    // ── Chat message rendering ────────
-    function addChatMessage(speaker, text) {
-      // Remove placeholder
-      const placeholder = chatMessages.querySelector('.text-center');
-      if (placeholder && placeholder.textContent.includes('Connecting')) placeholder.remove();
-
-      const isAgent = speaker === 'agent';
-      const wrapper = document.createElement('div');
-      wrapper.className = `flex ${isAgent ? 'justify-start' : 'justify-end'}`;
-
-      const bubble = document.createElement('div');
-      bubble.className = isAgent
-        ? 'max-w-[80%] rounded-2xl rounded-tl-sm bg-slate-800 px-4 py-2.5 text-sm text-slate-100 break-words'
-        : 'max-w-[80%] rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-2.5 text-sm text-white break-words';
-      bubble.textContent = text;
-
-      wrapper.appendChild(bubble);
-      chatMessages.appendChild(wrapper);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function updateLiveSubtitle(text) {
-      if (isTextMode) return;
-      subtitleText.textContent = text;
-    }
-
-    // ── Show mode choice modal ────────
-    function showModeChoice(agentId, agentName, agentIcon) {
-      currentAgentId = agentId;
-      currentAgentName = agentName;
-      currentAgentIcon = agentIcon;
-      modalAgentName.textContent = `${agentName} — choose how you want to talk`;
-      modeModal.classList.remove('hidden');
-      modeModal.classList.add('flex');
-    }
-
-    function hideModeChoice() {
-      modeModal.classList.add('hidden');
-      modeModal.classList.remove('flex');
-    }
-
-    // ── Start conversation ────────────
-    async function startConversation(textMode) {
-      isTextMode = textMode;
-
-      // End any existing conversation
-      if (conversation) {
-        try { await conversation.endSession(); } catch (e) {}
-      }
-
-      agentPartialText = '';
-
-      // Open chat view
-      landingView.classList.add('hidden');
-      chatView.classList.remove('hidden');
-      chatView.classList.add('flex');
-      document.body.classList.add('chat-open');
-
-      chatAgentName.textContent = currentAgentName;
-      chatAgentIcon.textContent = currentAgentIcon;
-      chatStatus.textContent = 'Connecting…';
-      chatMessages.innerHTML = '<p class="text-center text-sm text-slate-600">Connecting…</p>';
-
-      // Show/hide mode-specific UI
-      if (textMode) {
-        subtitleBar.classList.add('hidden');
-        muteBtn.classList.add('hidden');
-        chatModeIndicator.classList.add('hidden');
+    // ── Auth State ───────────────────────
+    async function initAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        currentUser = session.user;
+        showUserMenu();
       } else {
-        subtitleBar.classList.remove('hidden');
-        muteBtn.classList.remove('hidden');
-        chatModeIndicator.classList.remove('hidden');
-        chatModeIndicator.classList.add('flex');
+        showAuthPrompt();
       }
 
-      try {
-        const opts = {
-          agentId: currentAgentId,
-          textOnly: textMode,
-          onConnect: () => {
-            chatStatus.textContent = textMode ? 'Text chat' : 'Connected';
-          },
-          onDisconnect: () => {
-            chatStatus.textContent = 'Disconnected';
-            conversation = null;
-            // If briefing just ended, show transition to Barker
-            if (currentPhase === 1) {
-              setTimeout(() => showTransition(), 300);
-            }
-          },
-          onMessage: (message) => {
-            if (message.source === 'user') {
-              agentPartialText = '';
-              addChatMessage('user', message.message);
-            } else if (message.source === 'ai') {
-              agentPartialText = '';
-              updateLiveSubtitle('');
-              addChatMessage('agent', message.message);
-            }
-          },
-          onAgentChatResponsePart: (part) => {
-            const text = typeof part === 'string' ? part : (part?.text || '');
-            if (!text) return;
-            agentPartialText += text;
-            updateLiveSubtitle(agentPartialText);
-          },
-          onAgentResponseCorrection: (correction) => {
-            if (correction?.corrected_agent_response) {
-              updateLiveSubtitle(correction.corrected_agent_response);
-            }
-          },
-          onError: (error) => {
-            console.error('Conversation error:', error);
-            chatStatus.textContent = `Error: ${error.message || error}`;
-          },
-          onStatusChange: (statusData) => {
-            const status = statusData?.status || statusData;
-            if (status === 'connected') {
-              chatStatus.textContent = textMode ? 'Text chat' : 'Connected';
-            } else if (status === 'connecting') {
-              chatStatus.textContent = 'Connecting…';
-            } else if (status === 'disconnected') {
-              chatStatus.textContent = 'Disconnected';
-            }
-          },
-          onModeChange: (modeData) => {
-            if (isTextMode) return;
-            const mode = modeData?.mode || modeData;
-            if (mode === 'speaking') {
-              chatAgentIcon.textContent = currentAgentIcon;
-              chatModeText.textContent = 'Speaking';
-              chatModeIndicator.querySelector('span').className = 'h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse';
-            } else if (mode === 'listening') {
-              chatAgentIcon.textContent = '👂';
-              chatModeText.textContent = 'Listening';
-              chatModeIndicator.querySelector('span').className = 'h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse';
-            }
-          },
-        };
-
-        conversation = await Conversation.startSession(opts);
-      } catch (err) {
-        console.error('Failed to start conversation:', err);
-        chatStatus.textContent = `Failed: ${err.message || err}`;
-      }
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          currentUser = session.user;
+          showUserMenu();
+          hideAuthModal();
+        } else if (event === 'SIGNED_OUT') {
+          currentUser = null;
+          hideUserMenu();
+          showAuthPrompt();
+        }
+      });
     }
 
-    // ── Close chat ────────────────────
-    async function closeChat() {
-      if (conversation) {
-        try { await conversation.endSession(); } catch (e) {}
-      }
-      chatView.classList.add('hidden');
-      chatView.classList.remove('flex');
-      landingView.classList.remove('hidden');
-      document.body.classList.remove('chat-open');
+    function showUserMenu() {
+      document.getElementById('auth-status-bar').classList.add('hidden');
+      const menu = document.getElementById('user-menu');
+      menu.classList.remove('hidden');
+      document.getElementById('user-email').textContent = currentUser.email;
     }
 
-    // ── Text input ────────────────────
-    async function sendText() {
-      const text = textInput.value.trim();
-      if (!text || !conversation) return;
-
-      agentPartialText = '';
-      updateLiveSubtitle('');
-      addChatMessage('user', text);
-      textInput.value = '';
-
-      try {
-        await conversation.sendUserMessage(text);
-      } catch (err) {
-        console.error('Failed to send:', err);
-      }
+    function hideUserMenu() {
+      document.getElementById('user-menu').classList.add('hidden');
     }
 
-    // ── Transition: Goodwill → Barker ───
-    function showTransition() {
-      // Close chat view, show landing behind modal
-      chatView.classList.add('hidden');
-      chatView.classList.remove('flex');
-      landingView.classList.remove('hidden');
-      document.body.classList.remove('chat-open');
-
-      // Unlock Barker if still locked
-      const barkerBtn = document.querySelector('button[data-agent="barker"]');
-      if (barkerBtn.disabled) {
-        barkerBtn.disabled = false;
-        barkerBtn.textContent = 'Start Conversation';
-        barkerBtn.className = 'w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500';
-        document.getElementById('barker-card').classList.remove('opacity-50');
-      }
-
-      // Show modal
-      transitionModal.classList.remove('hidden');
-      transitionModal.classList.add('flex');
+    function showAuthPrompt() {
+      document.getElementById('auth-status-bar').classList.remove('hidden');
+      hideUserMenu();
     }
 
-    function hideTransition() {
-      transitionModal.classList.add('hidden');
-      transitionModal.classList.remove('flex');
+    // ── Auth Modal ───────────────────────
+    const authModal = document.getElementById('auth-modal');
+    const authMagicForm = document.getElementById('auth-magic-link-form');
+    const authPasswordForm = document.getElementById('auth-password-form');
+    const authMagicSent = document.getElementById('auth-magic-sent');
+
+    document.getElementById('auth-signin-btn').addEventListener('click', () => {
+      authModal.classList.remove('hidden');
+      authMagicForm.classList.remove('hidden');
+      authPasswordForm.classList.add('hidden');
+      authMagicSent.classList.add('hidden');
+    });
+
+    document.getElementById('auth-cancel').addEventListener('click', hideAuthModal);
+    document.getElementById('auth-show-password').addEventListener('click', () => {
+      authMagicForm.classList.add('hidden');
+      authPasswordForm.classList.remove('hidden');
+    });
+    document.getElementById('auth-show-magic').addEventListener('click', () => {
+      authPasswordForm.classList.add('hidden');
+      authMagicForm.classList.remove('hidden');
+    });
+
+    function hideAuthModal() {
+      authModal.classList.add('hidden');
     }
 
-    // ── Event listeners ───────────────
-    sendBtn.addEventListener('click', sendText);
-    textInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendText();
+    // Magic Link
+    document.getElementById('auth-send-magic-link').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      if (!email) return;
+
+      const btn = document.getElementById('auth-send-magic-link');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin }
+      });
+
+      if (error) {
+        alert('Error: ' + error.message);
+        btn.textContent = 'Send Magic Link';
+        btn.disabled = false;
+      } else {
+        authMagicForm.classList.add('hidden');
+        authMagicSent.classList.remove('hidden');
       }
     });
-    textInput.addEventListener('input', () => {
-      if (conversation) conversation.sendUserActivity();
+
+    // Password Sign In
+    document.getElementById('auth-signin-pw').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email-pw').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!email || !password) return;
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) alert('Error: ' + error.message);
     });
 
-    chatBackBtn.addEventListener('click', closeChat);
-
-    muteBtn.addEventListener('click', () => {
-      if (!conversation || isTextMode) return;
-      isMuted = !isMuted;
-      try {
-        conversation.setMicMuted(isMuted);
-        muteBtn.textContent = isMuted ? '🔇' : '🎙️';
-      } catch (e) {
-        isMuted = !isMuted;
-      }
-    });
-
-    // Mode choice buttons
-    voiceBtn.addEventListener('click', () => {
-      hideModeChoice();
-      lastTextMode = false;
-      startConversation(false);
-    });
-    textBtn.addEventListener('click', () => {
-      hideModeChoice();
-      lastTextMode = true;
-      startConversation(true);
-    });
-    modalCancel.addEventListener('click', hideModeChoice);
-
-    // Transition modal buttons
-    transitionContinue.addEventListener('click', () => {
-      hideTransition();
-      setPhase(2);
-      currentPhase = 2;
-      showModeChoice(agentIds.barker, 'Mr. Barker', '🧑‍💼');
-    });
-    transitionCancel.addEventListener('click', () => {
-      hideTransition();
-    });
-
-    // ── PIN gate ───────────────────────
-    function requestPin(agent, agentName, agentIcon, phase) {
-      if (pinUnlocked) {
-        const id = agent === 'barker' ? agentIds.barker : agentIds.goodwill;
-        currentPhase = phase;
-        setPhase(phase);
-        showModeChoice(id, agentName, agentIcon);
+    // Password Sign Up
+    document.getElementById('auth-signup-pw').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email-pw').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!email || password.length < 6) {
+        alert('Password must be at least 6 characters');
         return;
       }
-      pendingAgent = { agent, name: agentName, icon: agentIcon, phase };
-      pinError.classList.add('hidden');
-      pinInput.value = '';
-      pinModal.classList.remove('hidden');
-      pinModal.classList.add('flex');
-      setTimeout(() => pinInput.focus(), 100);
+
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) alert('Error: ' + error.message);
+      else alert('Account created! You can now sign in.');
+    });
+
+    // User Menu
+    document.getElementById('user-menu-btn').addEventListener('click', () => {
+      document.getElementById('user-dropdown').classList.toggle('hidden');
+    });
+
+    document.getElementById('user-logout').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      document.getElementById('user-dropdown').classList.add('hidden');
+    });
+
+    document.getElementById('user-history').addEventListener('click', () => {
+      document.getElementById('user-dropdown').classList.add('hidden');
+      loadConversationHistory();
+    });
+
+    document.getElementById('history-close').addEventListener('click', () => {
+      document.getElementById('history-sidebar').classList.add('translate-x-full');
+      setTimeout(() => document.getElementById('history-sidebar').classList.add('hidden'), 300);
+    });
+
+    // ── Conversation History ─────────────
+    async function loadConversationHistory() {
+      const sidebar = document.getElementById('history-sidebar');
+      sidebar.classList.remove('hidden');
+      sidebar.classList.remove('translate-x-full');
+
+      const list = document.getElementById('history-list');
+      list.innerHTML = '<p class="text-center text-sm text-slate-500">Loading…</p>';
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        list.innerHTML = `<p class="text-center text-sm text-red-400">Error: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="text-center text-sm text-slate-500">No conversations yet</p>';
+        return;
+      }
+
+      list.innerHTML = data.map(conv => {
+        const date = new Date(conv.created_at).toLocaleDateString();
+        const agent = conv.agent === 'barker' ? '🧑‍💼 Mr. Barker' : '👩‍🏫 Ms. Goodwill';
+        const msgCount = conv.messages?.length || 0;
+        return `
+          <div class="rounded-lg border border-slate-700 bg-slate-800/50 p-3 cursor-pointer hover:bg-slate-800 transition" data-conv-id="${conv.id}">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-slate-200">${agent}</span>
+              <span class="text-xs text-slate-500">${date}</span>
+            </div>
+            <p class="text-xs text-slate-400">${msgCount} messages · ${conv.mode}</p>
+            ${conv.summary ? `<p class="text-xs text-slate-500 mt-1 truncate">${conv.summary}</p>` : ''}
+          </div>
+        `;
+      }).join('');
     }
 
-    async function checkPin() {
-      const entered = pinInput.value.trim();
-      if (!entered) return;
+    async function saveConversation() {
+      if (!currentUser || !currentConversationId) return;
 
-      pinSubmit.textContent = 'Checking…';
-      pinSubmit.disabled = true;
-      pinError.classList.add('hidden');
+      const { error } = await supabase
+        .from('conversations')
+        .update({
+          messages: conversationMessages,
+          ended_at: new Date().toISOString()
+        })
+        .eq('id', currentConversationId);
+
+      if (error) console.error('Save error:', error);
+    }
+
+    async function createConversation(agent, mode) {
+      if (!currentUser) return null;
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .insert({
+          user_id: currentUser.id,
+          agent,
+          mode,
+          messages: []
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        console.error('Create conversation error:', error);
+        return null;
+      }
+
+      return data.id;
+    }
+
+    // ── Conversation Helpers ─────────────
+    function addMessage(role, text) {
+      const msg = { role, text, time: new Date().toISOString() };
+      conversationMessages.push(msg);
+      renderMessage(role, text);
+      saveConversation();
+      return msg;
+    }
+
+    function renderMessage(role, text) {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+      div.innerHTML = `
+        <div class="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
+          role === 'user'
+            ? 'bg-blue-600 text-white rounded-br-md'
+            : 'bg-slate-800 text-slate-200 rounded-bl-md'
+        }">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ── Phase / UI ───────────────────────
+    function setPhase(n) {
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`phase-${i}`);
+        if (i === n) {
+          el.className = 'flex items-center gap-1.5 sm:gap-2 rounded-lg border border-blue-500 bg-blue-500/10 px-2.5 sm:px-4 py-1.5 sm:py-2 font-medium text-blue-300 transition-all';
+        } else if (i < n) {
+          el.className = 'flex items-center gap-1.5 sm:gap-2 rounded-lg border border-green-500/50 bg-green-500/10 px-2.5 sm:px-4 py-1.5 sm:py-2 text-green-300 transition-all';
+        } else {
+          el.className = 'flex items-center gap-1.5 sm:gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2.5 sm:px-4 py-1.5 sm:py-2 text-slate-500 transition-all';
+        }
+      }
+      const hints = {
+        1: "Start with Ms. Goodwill — she'll brief you in German before the conversation.",
+        2: "You're talking with Mr. Barker. Answer his questions and practice your pitch.",
+        3: "Ms. Goodwill leads the reflection. Discuss what went well and what to improve."
+      };
+      document.getElementById('phase-hint').textContent = hints[n] || '';
+    }
+
+    // ── ElevenLabs SDK ───────────────────
+    let conversation = null;
+    let isMuted = false;
+
+    async function startConversation(agentId, agentName, agentIcon, mode) {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML = '<p class="text-center text-sm text-slate-600">Connecting…</p>';
+      document.getElementById('chat-view').classList.remove('hidden');
+      document.body.classList.add('chat-open');
+      document.getElementById('chat-agent-name').textContent = agentName;
+      document.getElementById('chat-agent-icon').textContent = agentIcon;
+      document.getElementById('chat-status').textContent = 'Connecting…';
+
+      conversationMessages = [];
+      const agent = agentId === BARKER_ID ? 'barker' : 'goodwill';
+      currentConversationId = await createConversation(agent, mode);
 
       try {
-        const resp = await fetch('/api/auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pin: entered }),
+        const module = await import('https://esm.sh/@elevenlabs/client@1.11.2');
+        const { Conversation } = module;
+
+        conversation = await Conversation.startSession({
+          agentId,
+          overrides: {
+            agent: { language: agentId === GOODWILL_ID ? 'de' : 'en' }
+          },
+          onConnect: () => {
+            document.getElementById('chat-status').textContent = mode === 'voice' ? 'Listening…' : 'Connected';
+            document.getElementById('chat-mode-indicator').classList.remove('hidden');
+            document.getElementById('chat-mode-indicator').classList.add('flex');
+            document.getElementById('chat-mode-text').textContent = mode === 'voice' ? 'Voice' : 'Text';
+            document.getElementById('chat-mode-indicator').querySelector('span').className = 'h-1.5 w-1.5 rounded-full bg-green-500';
+          },
+          onDisconnect: () => {
+            document.getElementById('chat-status').textContent = 'Disconnected';
+            document.getElementById('chat-mode-indicator').querySelector('span').className = 'h-1.5 w-1.5 rounded-full bg-slate-500';
+            if (currentConversationId) saveConversation();
+          },
+          onMessage: ({ source, message }) => {
+            const role = source === 'user' ? 'user' : 'agent';
+            addMessage(role, message);
+            if (mode === 'voice') {
+              document.getElementById('subtitle-text').textContent = message;
+              document.getElementById('subtitle-bar').classList.remove('hidden');
+            }
+          },
+          onError: (err) => {
+            console.error('ElevenLabs error:', err);
+            document.getElementById('chat-status').textContent = 'Error';
+          },
+          onModeChange: ({ mode: newMode }) => {
+            document.getElementById('chat-mode-text').textContent = newMode === 'speaking' ? 'Speaking…' : newMode === 'listening' ? 'Listening…' : 'Idle';
+          }
         });
 
-        const data = await resp.json();
-
-        if (resp.ok && data.ok) {
-          pinUnlocked = true;
-          agentIds = data.agents;
-          pinModal.classList.add('hidden');
-          pinModal.classList.remove('flex');
-          if (pendingAgent) {
-            currentPhase = pendingAgent.phase;
-            setPhase(pendingAgent.phase);
-            const id = pendingAgent.agent === 'barker' ? agentIds.barker : agentIds.goodwill;
-            showModeChoice(id, pendingAgent.name, pendingAgent.icon);
-            pendingAgent = null;
-          }
-        } else {
-          pinError.textContent = data.error || 'Wrong PIN';
-          pinError.classList.remove('hidden');
-          pinInput.value = '';
-          pinInput.focus();
+        if (mode === 'voice') {
+          document.getElementById('mute-btn').classList.remove('hidden');
+          document.getElementById('subtitle-bar').classList.remove('hidden');
         }
-      } catch (e) {
-        pinError.textContent = 'Connection error. Try again.';
-        pinError.classList.remove('hidden');
-      } finally {
-        pinSubmit.textContent = 'Unlock';
-        pinSubmit.disabled = false;
+
+      } catch (err) {
+        console.error('Failed to start:', err);
+        container.innerHTML = `<p class="text-center text-sm text-red-400">Error: ${err.message}</p>`;
       }
     }
 
-    pinSubmit.addEventListener('click', checkPin);
-    pinInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); checkPin(); }
+    function endConversation() {
+      if (conversation) {
+        conversation.endSession();
+        conversation = null;
+      }
+      saveConversation();
+      currentConversationId = null;
+      conversationMessages = [];
+      document.getElementById('chat-view').classList.add('hidden');
+      document.body.classList.remove('chat-open');
+      document.getElementById('mute-btn').classList.add('hidden');
+      document.getElementById('subtitle-bar').classList.add('hidden');
+    }
+
+    // ── Event Listeners ──────────────────
+    document.getElementById('chat-back-btn').addEventListener('click', endConversation);
+
+    document.getElementById('send-btn').addEventListener('click', () => {
+      const input = document.getElementById('text-input');
+      const text = input.value.trim();
+      if (!text || !conversation) return;
+      conversation.sendUserMessage({ text });
+      input.value = '';
     });
-    pinCancel.addEventListener('click', () => {
-      pinModal.classList.add('hidden');
-      pinModal.classList.remove('flex');
+
+    document.getElementById('text-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('send-btn').click();
+      }
+    });
+
+    document.getElementById('mute-btn').addEventListener('click', () => {
+      if (!conversation) return;
+      isMuted = !isMuted;
+      if (isMuted) conversation.mute();
+      else conversation.unmute();
+      document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🎙️';
+      document.getElementById('mute-btn').title = isMuted ? 'Unmute' : 'Mute';
+    });
+
+    // ── Mode Choice ──────────────────────
+    let pendingAgent = null;
+    let pendingAgentName = null;
+    let pendingAgentIcon = null;
+    let pendingPhase = null;
+
+    function showModeChoice(agentId, agentName, agentIcon, phase) {
+      pendingAgent = agentId;
+      pendingAgentName = agentName;
+      pendingAgentIcon = agentIcon;
+      pendingPhase = phase;
+      document.getElementById('mode-modal').classList.remove('hidden');
+      document.getElementById('mode-modal-subtitle').textContent = `${agentName} — choose how you want to talk`;
+    }
+
+    document.getElementById('mode-voice').addEventListener('click', () => {
+      document.getElementById('mode-modal').classList.add('hidden');
+      if (pendingAgent) startConversation(pendingAgent, pendingAgentName, pendingAgentIcon, 'voice');
+    });
+
+    document.getElementById('mode-text').addEventListener('click', () => {
+      document.getElementById('mode-modal').classList.add('hidden');
+      if (pendingAgent) startConversation(pendingAgent, pendingAgentName, pendingAgentIcon, 'text');
+    });
+
+    document.getElementById('mode-cancel').addEventListener('click', () => {
+      document.getElementById('mode-modal').classList.add('hidden');
       pendingAgent = null;
     });
 
-    // Agent start buttons — PIN gate then mode choice
+    // ── Agent Start Buttons ──────────────
     document.querySelectorAll('button[data-action="start"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const agent = btn.dataset.agent;
-        if (agent === 'goodwill') {
-          btn.classList.add('hidden');
-          document.querySelector('button[data-action="start-reflection"]').classList.remove('hidden');
-          requestPin('goodwill', 'Ms. Goodwill', '👩‍🏫', 1);
+        if (!currentUser) {
+          authModal.classList.remove('hidden');
+          authMagicForm.classList.remove('hidden');
+          authPasswordForm.classList.add('hidden');
+          return;
         }
-        if (agent === 'barker') {
-          btn.classList.add('hidden');
-          document.getElementById('barker-card').classList.remove('opacity-50');
-          requestPin('barker', 'Mr. Barker', '🧑‍💼', 2);
+        if (agent === 'goodwill') {
+          showModeChoice(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', 1);
+        } else if (agent === 'barker') {
+          showModeChoice(BARKER_ID, 'Mr. Barker', '🧑‍💼', 2);
         }
       });
     });
 
-    document.querySelector('button[data-action="start-reflection"]')?.addEventListener('click', () => {
-      requestPin('goodwill', 'Ms. Goodwill', '👩‍🏫', 3);
+    document.querySelectorAll('button[data-action="start-reflection"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!currentUser) {
+          authModal.classList.remove('hidden');
+          authMagicForm.classList.remove('hidden');
+          authPasswordForm.classList.add('hidden');
+          return;
+        }
+        showModeChoice(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', 3);
+      });
     });
 
-    // Auto-unlock Mr. Barker after 15s
-    setTimeout(() => {
-      const barkerBtn = document.querySelector('button[data-agent="barker"]');
-      if (barkerBtn.disabled) {
-        barkerBtn.disabled = false;
-        barkerBtn.textContent = 'Start Conversation';
-        barkerBtn.className = 'w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500';
-        document.getElementById('barker-card').classList.remove('opacity-50');
-      }
-    }, 15000);
+    // ── Transition Modal ─────────────────
+    const transitionModal = document.getElementById('transition-modal');
+    document.getElementById('trans-continue').addEventListener('click', () => {
+      transitionModal.classList.add('hidden');
+      setPhase(2);
+      showModeChoice(BARKER_ID, 'Mr. Barker', '🧑‍💼', 2);
+    });
+    document.getElementById('trans-cancel').addEventListener('click', () => {
+      transitionModal.classList.add('hidden');
+    });
+
+    // ── Init ─────────────────────────────
+    initAuth();
+    setPhase(1);
   </script>
 </Layout>
