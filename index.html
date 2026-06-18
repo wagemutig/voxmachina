@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Voice-only conversational AI training with adaptive Bloom's taxonomy questioning."><link rel="icon" type="image/svg+xml" href="/voxmachina/favicon.svg"><title>VoxMachina — Voice AI Training</title><link rel="stylesheet" href="/voxmachina/_astro/index.dxA7Ov9n.css"></head> <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">   <header class="relative overflow-hidden border-b border-slate-800"> <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div> <div class="relative mx-auto max-w-3xl px-6 py-12 text-center"> <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400"> <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Voice-only conversational AI training with adaptive Bloom's taxonomy questioning."><link rel="icon" type="image/svg+xml" href="/voxmachina/favicon.svg"><title>VoxMachina — Voice AI Training</title><link rel="stylesheet" href="/voxmachina/_astro/index.Rsc6E72W.css"></head> <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">   <header class="relative overflow-hidden border-b border-slate-800"> <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-slate-950 to-violet-950/30"></div> <div class="relative mx-auto max-w-3xl px-6 py-12 text-center"> <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/50 px-4 py-1.5 text-sm text-slate-400"> <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
 Powered by ElevenLabs Agents
 </div> <h1 class="bg-gradient-to-r from-blue-400 via-sky-300 to-violet-400 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-6xl">
 VoxMachina
@@ -104,23 +104,27 @@ Send
       const placeholder = transcriptLog.querySelector('.italic');
       if (placeholder) placeholder.remove();
 
-      const div = document.createElement('div');
-      div.className = 'flex gap-3';
       const isAgent = speaker === 'agent';
+      const div = document.createElement('div');
+      div.className = 'space-y-0.5';
 
-      const timeEl = document.createElement('div');
-      timeEl.className = 'shrink-0 text-xs text-slate-600 pt-0.5';
+      // Name + time on one line
+      const header = document.createElement('div');
+      header.className = 'flex items-baseline gap-2';
+      const nameEl = document.createElement('span');
+      nameEl.className = `${isAgent ? 'text-blue-300' : 'text-violet-300'} text-xs sm:text-sm font-medium`;
+      nameEl.textContent = isAgent ? agentName : 'You';
+      const timeEl = document.createElement('span');
+      timeEl.className = 'text-xs text-slate-600';
       timeEl.textContent = entry.time;
+      header.append(nameEl, timeEl);
 
-      const nameEl = document.createElement('div');
-      nameEl.className = `${isAgent ? 'text-blue-300' : 'text-violet-300'} text-sm font-medium shrink-0`;
-      nameEl.textContent = `${isAgent ? agentName : 'You'}:`;
-
-      const msgEl = document.createElement('div');
-      msgEl.className = 'text-sm text-slate-300 flex-1';
+      // Message below, full width
+      const msgEl = document.createElement('p');
+      msgEl.className = 'text-sm text-slate-300 leading-relaxed break-words';
       msgEl.textContent = text;
 
-      div.append(timeEl, nameEl, msgEl);
+      div.append(header, msgEl);
       transcriptLog.appendChild(div);
       transcriptLog.scrollTop = transcriptLog.scrollHeight;
     }
