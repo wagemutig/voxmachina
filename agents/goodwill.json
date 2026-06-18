@@ -1,10 +1,11 @@
 {
   "name": "Ms. Goodwill — German Mentor",
-  "description": "Voice-only training mentor. Briefs in German before sessions, leads reflection after.",
+  "description": "Voice/text training mentor. Briefs in German before sessions, leads reflection after.",
+  "agent_id": "agent_5001kvdjcj2ke88aenh6yq6wh02h",
   "conversation_config": {
     "agent": {
       "prompt": {
-        "llm": "gpt-4o-mini",
+        "llm": "gpt-4o",
         "temperature": 0.7,
         "max_tokens": 300
       },
@@ -13,9 +14,10 @@
     },
     "tts": {
       "voice_id": "EXAVITQu4vr4xnSDxMaL",
+      "voice_name": "Sarah - Mature, Reassuring, Confident (female)",
       "model_id": "eleven_flash_v2_5",
       "stability": 0.5,
-      "similarity_boost": 0.7,
+      "similarity_boost": 0.75,
       "style": 0.3,
       "speed": 1.0
     },

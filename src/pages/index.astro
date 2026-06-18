@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const BARKER_ID = 'agent_1701kvcwacnje8dsehmmrsged276';
-const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
+const BARKER_ID = 'agent_9601kvdjdvqefd99es8881mc4z9g';
+const GOODWILL_ID = 'agent_5001kvdjcj2ke88aenh6yq6wh02h';
+const ACCESS_PIN = '1924'; // Change this to your desired PIN
 ---
 
 <Layout title="VoxMachina — Voice AI Training">
@@ -168,6 +169,31 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
     </div>
   </div>
 
+  <!-- ═══════ PIN GATE MODAL ═══════ -->
+  <div id="pin-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="w-full max-w-xs rounded-2xl border border-slate-700 bg-slate-900 p-6 text-center">
+      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-violet-500/20 text-2xl">🔒</div>
+      <h3 class="text-lg font-semibold text-slate-100 mb-1">Access Code</h3>
+      <p class="text-sm text-slate-500 mb-5">Enter PIN to start a conversation</p>
+      <input
+        id="pin-input"
+        type="tel"
+        inputmode="numeric"
+        maxlength="4"
+        placeholder="••••"
+        class="w-full text-center text-2xl tracking-[0.5em] rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:outline-none"
+        autocomplete="off"
+      />
+      <p id="pin-error" class="hidden text-xs text-red-400 mt-2">Wrong PIN. Try again.</p>
+      <button id="pin-submit" class="mt-4 w-full rounded-xl bg-violet-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-violet-500">
+        Unlock
+      </button>
+      <button id="pin-cancel" class="mt-3 w-full text-center text-sm text-slate-500 hover:text-slate-300 transition">
+        Cancel
+      </button>
+    </div>
+  </div>
+
   <!-- ═══════ MODE CHOICE MODAL ═══════ -->
   <div id="mode-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
     <div class="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6">
@@ -214,8 +240,9 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
   <script type="module">
     import { Conversation } from 'https://esm.sh/@elevenlabs/client@1.11.2';
 
-    const BARKER_ID = 'agent_1701kvcwacnje8dsehmmrsged276';
-    const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
+    const BARKER_ID = 'agent_9601kvdjdvqefd99es8881mc4z9g';
+    const GOODWILL_ID = 'agent_5001kvdjcj2ke88aenh6yq6wh02h';
+    const ACCESS_PIN = '1924';
 
     // ── State ──────────────────────────
     let conversation = null;
@@ -251,6 +278,13 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
     const transitionModal = document.getElementById('transition-modal');
     const transitionContinue = document.getElementById('transition-continue');
     const transitionCancel = document.getElementById('transition-cancel');
+    const pinModal = document.getElementById('pin-modal');
+    const pinInput = document.getElementById('pin-input');
+    const pinError = document.getElementById('pin-error');
+    const pinSubmit = document.getElementById('pin-submit');
+    const pinCancel = document.getElementById('pin-cancel');
+    let pinUnlocked = false;
+    let pendingAgent = null; // { id, name, icon, phase }
 
     // ── Phase management ───────────────
     const phases = {
@@ -512,39 +546,80 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
     // Transition modal buttons
     transitionContinue.addEventListener('click', () => {
       hideTransition();
+      // PIN already unlocked, go straight to mode choice
       setPhase(2);
-      // Start Barker with same mode as last conversation
+      currentPhase = 2;
       showModeChoice(BARKER_ID, 'Mr. Barker', '🧑‍💼');
     });
     transitionCancel.addEventListener('click', () => {
       hideTransition();
     });
 
-    // Agent start buttons — show mode choice
+    // ── PIN gate ───────────────────────
+    function requestPin(agentId, agentName, agentIcon, phase) {
+      if (pinUnlocked) {
+        // Already unlocked, skip straight to mode choice
+        currentPhase = phase;
+        setPhase(phase);
+        showModeChoice(agentId, agentName, agentIcon);
+        return;
+      }
+      pendingAgent = { id: agentId, name: agentName, icon: agentIcon, phase };
+      pinError.classList.add('hidden');
+      pinInput.value = '';
+      pinModal.classList.remove('hidden');
+      pinModal.classList.add('flex');
+      setTimeout(() => pinInput.focus(), 100);
+    }
+
+    function checkPin() {
+      const entered = pinInput.value.trim();
+      if (entered === ACCESS_PIN) {
+        pinUnlocked = true;
+        pinModal.classList.add('hidden');
+        pinModal.classList.remove('flex');
+        if (pendingAgent) {
+          currentPhase = pendingAgent.phase;
+          setPhase(pendingAgent.phase);
+          showModeChoice(pendingAgent.id, pendingAgent.name, pendingAgent.icon);
+          pendingAgent = null;
+        }
+      } else {
+        pinError.classList.remove('hidden');
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    }
+
+    pinSubmit.addEventListener('click', checkPin);
+    pinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); checkPin(); }
+    });
+    pinCancel.addEventListener('click', () => {
+      pinModal.classList.add('hidden');
+      pinModal.classList.remove('flex');
+      pendingAgent = null;
+    });
+
+    // Agent start buttons — PIN gate then mode choice
     document.querySelectorAll('button[data-action="start"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const agent = btn.dataset.agent;
         if (agent === 'goodwill') {
           btn.classList.add('hidden');
           document.querySelector('button[data-action="start-reflection"]').classList.remove('hidden');
-          setPhase(1);
-          currentPhase = 1;
-          showModeChoice(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫');
+          requestPin(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', 1);
         }
         if (agent === 'barker') {
           btn.classList.add('hidden');
           document.getElementById('barker-card').classList.remove('opacity-50');
-          setPhase(2);
-          currentPhase = 2;
-          showModeChoice(BARKER_ID, 'Mr. Barker', '🧑‍💼');
+          requestPin(BARKER_ID, 'Mr. Barker', '🧑‍💼', 2);
         }
       });
     });
 
     document.querySelector('button[data-action="start-reflection"]')?.addEventListener('click', () => {
-      setPhase(3);
-      currentPhase = 3;
-      showModeChoice(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫');
+      requestPin(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫', 3);
     });
 
     // Auto-unlock Mr. Barker after 15s
