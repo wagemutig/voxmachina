@@ -119,9 +119,10 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       <!-- Status + Subtitle Line -->
       <div class="flex items-center gap-3 min-h-[2rem]">
         <div id="subtitle-speaker-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-lg">💬</div>
-        <div class="flex-1">
-          <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed">Waiting for conversation to start…</p>
+        <div class="flex-1 min-w-0">
+          <p id="subtitle-text" class="text-sm text-slate-300 leading-relaxed break-words">Waiting for conversation to start…</p>
         </div>
+        <span id="mode-label" class="hidden shrink-0 text-xs font-medium text-slate-500"></span>
         <div id="subtitle-indicator" class="flex gap-1 shrink-0">
           <span class="h-2 w-2 rounded-full bg-slate-600"></span>
           <span class="h-2 w-2 rounded-full bg-slate-600"></span>
@@ -129,6 +130,9 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
         </div>
         <button id="end-call-btn" class="hidden shrink-0 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-500">
           End Call
+        </button>
+        <button id="mute-btn" class="hidden shrink-0 rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-600" title="Mute microphone">
+          🎙️
         </button>
       </div>
 
@@ -151,7 +155,7 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
 
   <!-- ElevenLabs JS SDK -->
   <script type="module">
-    import { Conversation } from 'https://esm.sh/@elevenlabs/client@latest';
+    import { Conversation } from 'https://esm.sh/@elevenlabs/client@1.11.2';
 
     const BARKER_ID = 'agent_1701kvcwacnje8dsehmmrsged276';
     const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
@@ -189,6 +193,9 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
     const textInput = document.getElementById('text-input');
     const sendBtn = document.getElementById('send-btn');
     const endCallBtn = document.getElementById('end-call-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    const modeLabel = document.getElementById('mode-label');
+    let isMuted = false;
 
     // ── Subtitle + Transcript ──────────────────
     function showSubtitles(speaker, text, icon) {
@@ -219,13 +226,20 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       const div = document.createElement('div');
       div.className = 'flex gap-3';
       const isAgent = speaker === 'agent';
-      div.innerHTML = `
-        <div class="shrink-0 text-xs text-slate-600 pt-0.5">${entry.time}</div>
-        <div class="${isAgent ? 'text-blue-300' : 'text-violet-300'} text-sm font-medium shrink-0">
-          ${isAgent ? agentName : 'You'}:
-        </div>
-        <div class="text-sm text-slate-300 flex-1">${text}</div>
-      `;
+
+      const timeEl = document.createElement('div');
+      timeEl.className = 'shrink-0 text-xs text-slate-600 pt-0.5';
+      timeEl.textContent = entry.time;
+
+      const nameEl = document.createElement('div');
+      nameEl.className = `${isAgent ? 'text-blue-300' : 'text-violet-300'} text-sm font-medium shrink-0`;
+      nameEl.textContent = `${isAgent ? agentName : 'You'}:`;
+
+      const msgEl = document.createElement('div');
+      msgEl.className = 'text-sm text-slate-300 flex-1';
+      msgEl.textContent = text;
+
+      div.append(timeEl, nameEl, msgEl);
       transcriptLog.appendChild(div);
       transcriptLog.scrollTop = transcriptLog.scrollHeight;
     }
@@ -246,6 +260,14 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       // Show bottom bar
       bottomBar.classList.remove('hidden');
       endCallBtn.classList.remove('hidden');
+      muteBtn.classList.remove('hidden');
+      isMuted = false;
+      muteBtn.textContent = '🎙️';
+      muteBtn.title = 'Mute microphone';
+
+      // Auto-expand transcript
+      const details = document.querySelector('details');
+      if (details) details.open = true;
       subtitleText.textContent = `Connecting to ${agentName}…`;
       subtitleIcon.textContent = agentIcon;
 
@@ -253,13 +275,15 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
         conversation = await Conversation.startSession({
           agentId: agentId,
           onConnect: () => {
-            subtitleText.textContent = `Connected to ${agentName}. Start speaking or type below.`;
+            // Also handled by onStatusChange('connected')
+            console.log('Connected to', agentName);
           },
           onDisconnect: () => {
             subtitleText.textContent = 'Conversation ended.';
             const dots = subtitleIndicator.querySelectorAll('span');
             dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-slate-600');
             endCallBtn.classList.add('hidden');
+            muteBtn.classList.add('hidden');
             conversation = null;
           },
           onMessage: (message) => {
@@ -278,16 +302,12 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
           },
           // Live streaming: each text chunk as the agent generates it
           onAgentChatResponsePart: (part) => {
-            // part is { text: string, part_id: string, is_final: boolean }
-            const text = part.text || part;
-            // Update subtitle in real-time (accumulate partial text)
-            if (!window._agentPartialText) window._agentPartialText = '';
-            if (part.is_final) {
-              window._agentPartialText += text;
-            } else {
-              window._agentPartialText = text;
-            }
-            showSubtitles('agent', window._agentPartialText || text, agentIcon);
+            // part can be a string or { text: string, ... }
+            const text = typeof part === 'string' ? part : (part?.text || '');
+            if (!text) return;
+            // Always append — the final onMessage (source:'ai') will replace
+            window._agentPartialText = (window._agentPartialText || '') + text;
+            showSubtitles('agent', window._agentPartialText, agentIcon);
           },
           // Agent response correction (e.g. if agent rephrases)
           onAgentResponseCorrection: (correction) => {
@@ -299,15 +319,32 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
             console.error('Conversation error:', error);
             subtitleText.textContent = `Error: ${error.message || error}`;
           },
-          onStatusChange: (status) => {
+          onStatusChange: (statusData) => {
+            const status = statusData?.status || statusData;
             console.log('Status:', status);
+            if (status === 'connected') {
+              subtitleText.textContent = `Connected to ${agentName}. Start speaking or type below.`;
+            } else if (status === 'connecting') {
+              subtitleText.textContent = `Connecting to ${agentName}…`;
+            } else if (status === 'disconnected') {
+              subtitleText.textContent = 'Conversation ended.';
+            }
           },
-          onModeChange: (mode) => {
-            // mode: 'speaking' | 'listening'
+          onModeChange: (modeData) => {
+            // SDK passes { mode: 'speaking' | 'listening' }
+            const mode = modeData?.mode || modeData;
             if (mode === 'speaking') {
               subtitleIcon.textContent = agentIcon;
+              modeLabel.textContent = 'Agent speaking';
+              modeLabel.className = 'shrink-0 text-xs font-medium text-blue-400';
+              const dots = subtitleIndicator.querySelectorAll('span');
+              dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-blue-500 animate-pulse');
             } else if (mode === 'listening') {
               subtitleIcon.textContent = '👂';
+              modeLabel.textContent = 'Listening';
+              modeLabel.className = 'shrink-0 text-xs font-medium text-green-400';
+              const dots = subtitleIndicator.querySelectorAll('span');
+              dots.forEach(d => d.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse');
             }
           },
         });
@@ -358,6 +395,25 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       }
     });
 
+    // ── Mute Toggle ────────────────────────────
+    muteBtn.addEventListener('click', () => {
+      if (!conversation) return;
+      isMuted = !isMuted;
+      try {
+        conversation.setMicMuted(isMuted);
+        muteBtn.textContent = isMuted ? '🔇' : '🎙️';
+        muteBtn.title = isMuted ? 'Unmute microphone' : 'Mute microphone';
+        muteBtn.className = isMuted
+          ? 'hidden shrink-0 rounded-lg bg-red-600/80 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-500'
+          : 'hidden shrink-0 rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-600';
+        // Re-show since the 'hidden' class in the template is toggled by start/end
+        if (conversation) muteBtn.classList.remove('hidden');
+      } catch (e) {
+        console.error('Mute toggle failed:', e);
+        isMuted = !isMuted; // revert
+      }
+    });
+
     // ── Button Handlers ────────────────────────
     document.querySelectorAll('button[data-action="start"]').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -379,9 +435,13 @@ const GOODWILL_ID = 'agent_8201kvcwd293enybm2s3tpqkr9dy';
       });
     });
 
-    document.querySelector('button[data-action="start-reflection"]')?.addEventListener('click', () => {
+    document.querySelector('button[data-action="start-reflection"]')?.addEventListener('click', async () => {
       setPhase(3);
       document.getElementById('goodwill-card').scrollIntoView({ behavior: 'smooth' });
+      // Auto-expand transcript
+      const details = document.querySelector('details');
+      if (details) details.open = true;
+      await startConversation(GOODWILL_ID, 'Ms. Goodwill', '👩‍🏫');
     });
 
     // Auto-unlock Mr. Barker after 15s
